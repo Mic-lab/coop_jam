@@ -3,6 +3,7 @@ from .state import State
 # from .menu import Menu
 from ..button import Button
 from ..font import fonts
+from ..game_map import GameMap
 
 class Game(State):
 
@@ -14,7 +15,13 @@ class Game(State):
             'menu': Button(rects[0], 'back', 'basic'),
         }
 
+        self.game_map = GameMap(self)
+
     def sub_update(self):
+
+        self.game_map.update()
+
+
         self.game_surf.fill((20, 20, 20))
 
         # Update Buttons
@@ -25,3 +32,5 @@ class Game(State):
             if btn.clicked:
                 if key == 'menu':
                     self.handler.transition_to(self.handler.states.Menu)
+
+        self.game_map.render(self.game_surf)
