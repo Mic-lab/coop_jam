@@ -79,39 +79,11 @@ class Menu(State):
                     shader_handler.ctx.viewport = (0, 0, config.screen_size[0], config.screen_size[1])
                     # btn.text = f'Window Scale ({config.scale}x)'
                 elif key == 'fullscreen':
-
-                    if pygame.display.is_fullscreen():
-                        config.scale = 2
-                        config.screen_size = pygame.Vector2(config.GAME_SIZE)*config.scale
-                        self.handler.set_canvas_size(config.GAME_SIZE)
-
-                        screen.create_screen()
-                        shader_handler.ctx.viewport = (0, 0, *config.screen_size)
-                        
-                        self.buttons['scale'].enable()
-                        # self.buttons['scale'].text = f'Window Scale ({config.scale}x)'
-
-                    else:
-                        # desktop_size = pygame.display.get_desktop_sizes()[0]
-                        # ^ There's also this but not sure how this works for dual monitor setup:
-                        pygame.display.toggle_fullscreen()
-                        desktop_size = pygame.display.get_window_size()
-
-                        resize_scale, new_canvas_size = utils.pan_game_surf(
-                                self.handler.canvas.get_size(),
-                                config.GAME_RATIO,
-                                desktop_size,
-                                desktop_size[0]/desktop_size[1])
-                        
-                        self.handler.set_canvas_size(new_canvas_size)
-                        config.scale = resize_scale
-                        config.screen_size = desktop_size
-                        screen.create_screen()
-
-                        pygame.display.toggle_fullscreen()
-                        shader_handler.ctx.viewport = (0, 0, *config.screen_size)
-
+                    fullscreen = self.toggle_fullscreen()
+                    if fullscreen:
                         self.buttons['scale'].disable()
+                    else:
+                        self.buttons['scale'].enable()
 
         self.player.vel = [0, 0]
         if self.inputs['held'].get('a'):
