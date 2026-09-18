@@ -4,6 +4,7 @@ from .timer import Timer
 
 class Player(PhysicsEntity):
     
+    BOUNCE = 0.9
     GRAVITY_UP = 0.2
     GRAVITY_DOWN = 0.4
 
@@ -19,7 +20,7 @@ class Player(PhysicsEntity):
     def jump_rising(self):
         return self.jumping and self.vel[1] < 0
 
-    def update(self, actions, rects=None, allow_gravity=True):
+    def update(self, actions, rects=None, normal_collisions=True):
 
         started_jump = False
         if actions['jump_pressed']:
@@ -39,26 +40,12 @@ class Player(PhysicsEntity):
         if actions['move_right']:
             self.vel[0] += 0.5
 
-        if allow_gravity:
+        if normal_collisions:
             self.vel[0] *= 0.9
             self.vel[0] = max(-3, min(3, self.vel[0]))
 
-        # NOTE: idk if this activates at every frame cause gravity's intensity is subpixel
-        if self.collision_directions['down']:
-            self.grounded = True
-            if not started_jump:
-                self.vel[1] = 0
-                self.jumping = False
-        else:
-            if self.grounded:
-                self.grounded = False
-                self.grounded_timer.reset()
-
-        if self.collision_directions['up']:
-            self.vel[1] = 0
-
         if self.vel[1] > 0: self.jump_descent = True
-        if allow_gravity:
+        if normal_collisions:
             if self.jumping and not self.jump_descent:
                 self.vel[1] += self.GRAVITY_UP
             else:
@@ -68,6 +55,35 @@ class Player(PhysicsEntity):
         self.grounded_timer.update()
 
         super().update(rects)
+
+        # NOTE: idk if this activates at every frame cause gravity's intensity is subpixel
+        if self.collision_directions['down']:
+            self.grounded = True
+            if not started_jump:
+                if normal_collisions:
+                    self.vel[1] = 0
+                else:
+                    self.vel[1] *= -self.BOUNCE
+                    print('bouncing!')
+                    # input(f'{self.vel=}')
+                self.jumping = False
+        else:
+            if self.grounded:
+                self.grounded = False
+                self.grounded_timer.reset()
+
+        if self.collision_directions['up']:
+            if normal_collisions:
+                self.vel[1] = 0
+            else:
+                self.vel[1] *= -self.BOUNCE
+
+        if self.collision_directions['left'] or self.collision_directions['right']:
+            if normal_collisions:
+                self.vel[0] = 0
+            else:
+                self.vel[0] *= -self.BOUNCE
+
 
     def jump_release(self):
         if self.jumping and self.vel[1] < 0:
@@ -106,7 +122,7 @@ class Player1(Player):
 
 class Player2(Player):
 
-    PULL_SPEED = 4
+    PULL_SPEED = 5
     PULL_ACCELERATION = 0.2
 
     def __init__(self, game, *args, **kwargs):
@@ -153,7 +169,7 @@ class Player2(Player):
 
         self.pull_request_timer.update()
 
-        super().update(actions, rects, allow_gravity=not self.being_pulled)
+        super().update(actions, rects, normal_collisions=not self.being_pulled)
 
     def pull_request(self):
         self.pull_request_timer.reset()

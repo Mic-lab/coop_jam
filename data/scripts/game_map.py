@@ -1,5 +1,7 @@
 import pygame
 from pygame import Vector2 as Vec2
+
+from data.scripts.enemies import Enemy
 from .entity import Entity
 from . import config
 from .players import Player1, Player2
@@ -12,7 +14,11 @@ class Level:
 
     def load(self):
 
-        file_content = '''
+        level_content = '''
+
+               000000000
+
+
       000000000000
 00  00
 
@@ -21,13 +27,17 @@ class Level:
 
         self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
         self.player_2 = Player2(self.game_map.game, name='side', pos=(30, -30), action='idle')
+        self.enemies = [
+
+                Enemy(self.game_map.game, pos=(100, 0), name='side', action='idle')
+                ]
 
         tiles = []
 
         max_x = -1
 
         y = 0
-        for line in file_content.splitlines():
+        for line in level_content.splitlines():
             # if not line: continue
             for x, c in enumerate(line):
                 if x > max_x: max_x = x
@@ -51,13 +61,16 @@ class Level:
     @property
     def desired_offset(self):
         # return Vec2(self.player_1.rect.topleft)
-        return -Vec2(self.player_1.rect.center) + 0.5*config.GAME_SIZE
+        # return -Vec2(self.player_1.rect.center) + 0.5*config.GAME_SIZE
+        return -0.5*(Vec2(self.player_1.rect.center)+self.player_2.rect.center) + 0.5*config.GAME_SIZE
 
     def update(self):
         self.player_1.update(self.tiles)
         self.player_2.update(self.tiles)
         for tile in self.tiles:
             tile.update()
+        for enemy in self.enemies:
+            enemy.update()
 
         self.offset += 0.5*(self.desired_offset-self.offset)
 
@@ -67,6 +80,8 @@ class Level:
         self.player_2.render(surf, offset=rounded_offset)
         for tile in self.tiles:
             tile.render(surf, offset=rounded_offset)
+        for enemy in self.enemies:
+            enemy.render(surf, offset=rounded_offset)
 
 class GameMap:
 
