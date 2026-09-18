@@ -13,6 +13,9 @@ class Level:
     def load(self):
 
         file_content = '''
+       00000000000
+
+
 0000000000000000000000000
         '''
 
@@ -25,7 +28,7 @@ class Level:
 
         y = 0
         for line in file_content.splitlines():
-            if not line: continue
+            # if not line: continue
             for x, c in enumerate(line):
                 if x > max_x: max_x = x
                 pos = (x*config.TILE_SIZE[0], y*config.TILE_SIZE[1])

@@ -111,7 +111,7 @@ class PhysicsEntity(Entity):
                 elif axis == 1:
                     if self.vel[1] < 0:
                         delta = self.rect.top - rect.bottom
-                        direction = 'top'
+                        direction = 'up'
                     elif self.vel[1] > 0:
                         delta = self.rect.bottom - rect.top
                         direction = 'down'

@@ -1,3 +1,4 @@
+from pygame import Vector2 as Vec2
 from .entity import PhysicsEntity
 from .timer import Timer
 
@@ -52,6 +53,8 @@ class Player(PhysicsEntity):
                 self.grounded = False
                 self.grounded_timer.reset()
 
+        if self.collision_directions['up']:
+            self.vel[1] = 0
 
         if self.vel[1] > 0: self.jump_descent = True
         if self.jumping and not self.jump_descent:
@@ -77,7 +80,14 @@ class Player(PhysicsEntity):
 
 class Player1(Player):
 
+    def __init__(self, game, *args, **kwargs):
+        super().__init__(game, *args, **kwargs)
+        self.pull_request_timer = Timer(60, done=True)
+
     def update(self, rects=None):
+
+        if self.game.inputs['pressed'].get('b'):
+            self.pull_request_timer.reset()
 
         actions = {
                 'jump_pressed': self.game.inputs['pressed'].get('v'),
@@ -86,13 +96,21 @@ class Player1(Player):
                 'move_right': self.game.inputs['held'].get('d'),
                 }
 
+        self.pull_request_timer.update()
+
         super().update(actions, rects)
 
 
 
 class Player2(Player):
 
+    def __init__(self, game, *args, **kwargs):
+        super().__init__(game, *args, **kwargs)
+        self.being_pulled = False
+        self.pull_request_timer = Timer(120)
+
     def update(self, rects=None):
+        player_1 = self.game.game_map.level.player_1
 
         actions = {
                 'jump_pressed': False,
@@ -101,4 +119,24 @@ class Player2(Player):
                 'move_right': False,
                 }
 
+        if self.game.inputs['pressed'].get('m'):
+            self.pull_request()
+
+        if not self.pull_request_timer.done:
+            if not player_1.pull_request_timer.done:
+                self.being_pulled = True
+
+        if self.being_pulled:
+            self.real_pos += 0.1*(player_1.pos - self.pos)
+            if (Vec2(self.rect.center) - player_1.rect.center).length() < 10:
+                self.being_pulled = False
+                self.pull_request_timer.reset(done=True)
+                player_1.pull_request_timer.reset(done=True)
+
+
+        self.pull_request_timer.update()
+
         super().update(actions, rects)
+
+    def pull_request(self):
+        self.pull_request_timer.reset()
