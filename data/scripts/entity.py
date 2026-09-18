@@ -52,11 +52,12 @@ class Entity:
 
 class PhysicsEntity(Entity):
 
-    def __init__(self, vel=(0, 0), acceleration=(0, 0), max_vel=9999, *args, **kwargs):
+    def __init__(self, vel=(0, 0), acceleration=(0, 0), max_vel=9999, collision_mode='hard', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.vel = Vector2(vel)
         self.acceleration = Vector2(acceleration)
         self.max_vel = max_vel
+        self.collision_mode = collision_mode
         self.collision_directions = {'up': False,
                                      'right': False,
                                      'down': False,
@@ -87,8 +88,9 @@ class PhysicsEntity(Entity):
                                      'down': False,
                                      'left': False}
 
-        for axis in range(2):
-            self.resolve_collisions(axis, rects)
+        if self.collision_mode in ('hard', 'soft_tracked'):
+            for axis in range(2):
+                self.resolve_collisions(axis, rects)
 
     def resolve_collisions(self, axis, rects):
         # NOTE: Instead of breaking when finding tiles, it can also be useful
@@ -119,9 +121,12 @@ class PhysicsEntity(Entity):
                         delta = 0
                         print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
 
-                v = Vector2(0, 0)
-                v[axis] = delta
-                self.change_pos(-v)
+                if self.collision_mode == 'hard':
+                    v = Vector2(0, 0)
+                    v[axis] = delta
+                    self.change_pos(-v)
+
+
                 if direction: self.collision_directions[direction] = True
                 return
 

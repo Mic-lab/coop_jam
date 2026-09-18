@@ -19,7 +19,7 @@ class Player(PhysicsEntity):
     def jump_rising(self):
         return self.jumping and self.vel[1] < 0
 
-    def update(self, actions, rects=None):
+    def update(self, actions, rects=None, allow_gravity=True):
 
         started_jump = False
         if actions['jump_pressed']:
@@ -39,8 +39,9 @@ class Player(PhysicsEntity):
         if actions['move_right']:
             self.vel[0] += 0.5
 
-        self.vel[0] *= 0.9
-        self.vel[0] = max(-3, min(3, self.vel[0]))
+        if allow_gravity:
+            self.vel[0] *= 0.9
+            self.vel[0] = max(-3, min(3, self.vel[0]))
 
         # NOTE: idk if this activates at every frame cause gravity's intensity is subpixel
         if self.collision_directions['down']:
@@ -57,10 +58,11 @@ class Player(PhysicsEntity):
             self.vel[1] = 0
 
         if self.vel[1] > 0: self.jump_descent = True
-        if self.jumping and not self.jump_descent:
-            self.vel[1] += self.GRAVITY_UP
-        else:
-            self.vel[1] += self.GRAVITY_DOWN
+        if allow_gravity:
+            if self.jumping and not self.jump_descent:
+                self.vel[1] += self.GRAVITY_UP
+            else:
+                self.vel[1] += self.GRAVITY_DOWN
 
         self.jump_timer.update()
         self.grounded_timer.update()
@@ -104,6 +106,9 @@ class Player1(Player):
 
 class Player2(Player):
 
+    PULL_SPEED = 4
+    PULL_ACCELERATION = 0.2
+
     def __init__(self, game, *args, **kwargs):
         super().__init__(game, *args, **kwargs)
         self.being_pulled = False
@@ -125,18 +130,30 @@ class Player2(Player):
         if not self.pull_request_timer.done:
             if not player_1.pull_request_timer.done:
                 self.being_pulled = True
+                vel = (player_1.pos - self.pos)
+                vel.scale_to_length(self.PULL_SPEED)
+                self.vel = vel
 
         if self.being_pulled:
-            self.real_pos += 0.1*(player_1.pos - self.pos)
+            # self.collision_mode = 'soft'
+            acceleration = (player_1.pos - self.pos)
+            acceleration.scale_to_length(self.PULL_ACCELERATION)
+            self.vel += acceleration
+            if self.vel.length() > self.PULL_SPEED:
+                self.vel.scale_to_length(self.PULL_SPEED)
+
             if (Vec2(self.rect.center) - player_1.rect.center).length() < 10:
                 self.being_pulled = False
                 self.pull_request_timer.reset(done=True)
                 player_1.pull_request_timer.reset(done=True)
+        else:
+            pass
+            # self.collision_mode = 'hard'
 
 
         self.pull_request_timer.update()
 
-        super().update(actions, rects)
+        super().update(actions, rects, allow_gravity=not self.being_pulled)
 
     def pull_request(self):
         self.pull_request_timer.reset()
