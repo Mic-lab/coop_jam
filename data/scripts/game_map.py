@@ -13,8 +13,7 @@ class Level:
     def load(self):
 
         file_content = '''
-00000000000
-00000000000
+0000000000000000000000000
         '''
 
         self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
@@ -60,10 +59,11 @@ class Level:
         self.offset += 0.5*(self.desired_offset-self.offset)
 
     def render(self, surf):
-        self.player_1.render(surf, offset=self.offset)
-        self.player_2.render(surf, offset=self.offset)
+        rounded_offset = Vec2(int(self.offset[0]), int(self.offset[1]))
+        self.player_1.render(surf, offset=rounded_offset)
+        self.player_2.render(surf, offset=rounded_offset)
         for tile in self.tiles:
-            tile.render(surf, offset=self.offset)
+            tile.render(surf, offset=rounded_offset)
 
 class GameMap:
 

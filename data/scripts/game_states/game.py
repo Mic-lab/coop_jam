@@ -22,7 +22,7 @@ class Game(State):
         self.game_map.update()
 
 
-        self.game_surf.fill((20, 20, 20))
+        self.game_surf.fill((5, 6, 8))
 
         # Update Buttons
         for key, btn in self.buttons.items():

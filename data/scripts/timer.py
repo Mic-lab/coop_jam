@@ -9,7 +9,11 @@ class Timer:
             self.reset()
         self.capped = capped
 
-    def reset(self):
+    def reset(self, done=False):
+        if done:
+            self.frame = self.duration
+            self.done = True
+            return
         self.frame = 0
         self.done = False
 

@@ -2,7 +2,7 @@ from pygame import Vector2 as Vec2
 
 # https://pacoup.com/2011/06/12/list-of-true-169-resolutions/
 GAME_SIZE = Vec2(640, 360)
-GAME_SIZE = Vec2(600, 400)
+# GAME_SIZE = Vec2(600, 400)
 GAME_RATIO = GAME_SIZE[0]/GAME_SIZE[1]
 
 scale = 2
