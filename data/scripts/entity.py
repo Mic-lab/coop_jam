@@ -88,14 +88,14 @@ class PhysicsEntity(Entity):
                                      'down': False,
                                      'left': False}
 
-        if self.collision_mode in ('hard', 'soft_tracked'):
-            for axis in range(2):
-                self.resolve_collisions(axis, rects)
+        for axis in range(2):
+            self.resolve_collisions(axis, rects)
 
     def resolve_collisions(self, axis, rects):
         # NOTE: Instead of breaking when finding tiles, it can also be useful
         # to append all collided tiles to the collisions directions
         self.real_pos[axis] += self.vel[axis]
+        if self.collision_mode not in ('hard', 'soft_tracked'): return
         direction = None
         for tile in rects:
             rect = tile.rect

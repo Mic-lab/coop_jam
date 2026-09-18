@@ -2,6 +2,10 @@ from pygame import Vector2 as Vec2
 from .entity import PhysicsEntity
 from .timer import Timer
 
+def scale_to_length(vector, length):
+    if not vector: return vector
+    vector.scale_to_length(length)
+
 class Player(PhysicsEntity):
     
     BOUNCE = 0.9
@@ -147,29 +151,30 @@ class Player2(Player):
             if not player_1.pull_request_timer.done:
                 self.being_pulled = True
                 vel = (player_1.pos - self.pos)
-                vel.scale_to_length(self.PULL_SPEED)
+                scale_to_length(vel, self.PULL_SPEED)
                 self.vel = vel
 
         if self.being_pulled:
-            # self.collision_mode = 'soft'
+            self.collision_mode = 'soft'
             acceleration = (player_1.pos - self.pos)
-            acceleration.scale_to_length(self.PULL_ACCELERATION)
+            scale_to_length(acceleration, self.PULL_ACCELERATION)
             self.vel += acceleration
             if self.vel.length() > self.PULL_SPEED:
-                self.vel.scale_to_length(self.PULL_SPEED)
+                scale_to_length(self.vel, self.PULL_SPEED)
 
-            if (Vec2(self.rect.center) - player_1.rect.center).length() < 10:
-                self.being_pulled = False
-                self.pull_request_timer.reset(done=True)
-                player_1.pull_request_timer.reset(done=True)
         else:
             pass
-            # self.collision_mode = 'hard'
+            self.collision_mode = 'hard'
 
 
         self.pull_request_timer.update()
 
         super().update(actions, rects, normal_collisions=not self.being_pulled)
+
+        if (Vec2(self.rect.center) - player_1.rect.center).length() < 10 and not any(self.collision_directions.values()):
+            self.being_pulled = False
+            self.pull_request_timer.reset(done=True)
+            player_1.pull_request_timer.reset(done=True)
 
     def pull_request(self):
         self.pull_request_timer.reset()
