@@ -37,7 +37,15 @@ class Entity:
 
     def render(self, surf, offset=(0,0)):
         # pygame.draw.rect(surf, (255, 0, 0), self.rect)
-        surf.blit(self.img, self.pos+offset)
+        render_pos = self.pos + offset
+
+        surf.blit(self.img, render_pos)
+        # try:
+        #     pygame.draw.rect(surf, (255, 0, 0), (self.rect.x + offset[0],
+        #                                          self.rect.y + offset[1],
+        #                                          self.rect.w,
+        #                                          self.rect.h), 1)
+        # except KeyError: pass
 
     def __repr__(self):
         return f'<{self.name}>'
@@ -87,7 +95,8 @@ class PhysicsEntity(Entity):
         # to append all collided tiles to the collisions directions
         self.real_pos[axis] += self.vel[axis]
         direction = None
-        for rect in rects:
+        for tile in rects:
+            rect = tile.rect
             if self.rect.colliderect(rect):
                 if axis == 0:
                     if self.vel[0] > 0:

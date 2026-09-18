@@ -2,7 +2,7 @@ import pygame
 from pygame import Vector2 as Vec2
 from .entity import Entity
 from . import config
-from .player import Player
+from .players import Player1, Player2
 
 class Level:
 
@@ -13,12 +13,12 @@ class Level:
     def load(self):
 
         file_content = '''
-0000000
-0000000
+00000000000
+00000000000
         '''
 
-        self.player_1 = Player(name='side', pos=(0, 0), action='idle')
-        self.player_2 = Player(name='side', pos=(10, 0), action='idle')
+        self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
+        self.player_2 = Player2(self.game_map.game, name='side', pos=(30, -30), action='idle')
 
         tiles = []
 
@@ -31,7 +31,7 @@ class Level:
                 if x > max_x: max_x = x
                 pos = (x*config.TILE_SIZE[0], y*config.TILE_SIZE[1])
                 if c == '0':
-                    tile = Tile(pos, 'ground')
+                    tile = Tile(pos, 'ground', action='idle')
                     tiles.append(tile)
                 elif c == ' ':
                     pass
@@ -48,11 +48,12 @@ class Level:
 
     @property
     def desired_offset(self):
-        return self.player_1.rect.center + 0.5*config.GAME_SIZE
+        # return Vec2(self.player_1.rect.topleft)
+        return -Vec2(self.player_1.rect.center) + 0.5*config.GAME_SIZE
 
     def update(self):
-        self.player_1.update()
-        self.player_2.update()
+        self.player_1.update(self.tiles)
+        self.player_2.update(self.tiles)
         for tile in self.tiles:
             tile.update()
 
