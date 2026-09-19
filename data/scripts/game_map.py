@@ -16,11 +16,20 @@ class Level:
 
         level_content = '''
 
+
+
+0000000000000
+
+
+
+
+
+0000000000000
+
                000000000
 
 
       000000000000
-00  00
 
 0000000000000000000000000
         '''
@@ -29,7 +38,7 @@ class Level:
         self.player_2 = Player2(self.game_map.game, name='side', pos=(30, -30), action='idle')
         self.enemies = [
 
-                Enemy(self.game_map.game, pos=(100, 0), name='side', action='idle')
+                Enemy(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
                 ]
 
         tiles = []

@@ -1,5 +1,5 @@
 from pygame import Vector2 as Vec2
-from .entity import PhysicsEntity
+from .entity import PhysicsEntity, Entity
 from .timer import Timer
 
 def scale_to_length(vector, length):
@@ -24,7 +24,7 @@ class Player(PhysicsEntity):
     def jump_rising(self):
         return self.jumping and self.vel[1] < 0
 
-    def update(self, actions, rects=None, normal_collisions=True):
+    def update(self, actions, rects=None):
 
         started_jump = False
         if actions['jump_pressed']:
@@ -44,16 +44,14 @@ class Player(PhysicsEntity):
         if actions['move_right']:
             self.vel[0] += 0.5
 
-        if normal_collisions:
-            self.vel[0] *= 0.9
-            self.vel[0] = max(-3, min(3, self.vel[0]))
+        self.vel[0] *= 0.9
+        self.vel[0] = max(-3, min(3, self.vel[0]))
 
         if self.vel[1] > 0: self.jump_descent = True
-        if normal_collisions:
-            if self.jumping and not self.jump_descent:
-                self.vel[1] += self.GRAVITY_UP
-            else:
-                self.vel[1] += self.GRAVITY_DOWN
+        if self.jumping and not self.jump_descent:
+            self.vel[1] += self.GRAVITY_UP
+        else:
+            self.vel[1] += self.GRAVITY_DOWN
 
         self.jump_timer.update()
         self.grounded_timer.update()
@@ -64,12 +62,7 @@ class Player(PhysicsEntity):
         if self.collision_directions['down']:
             self.grounded = True
             if not started_jump:
-                if normal_collisions:
-                    self.vel[1] = 0
-                else:
-                    self.vel[1] *= -self.BOUNCE
-                    print('bouncing!')
-                    # input(f'{self.vel=}')
+                self.vel[1] = 0
                 self.jumping = False
         else:
             if self.grounded:
@@ -77,17 +70,10 @@ class Player(PhysicsEntity):
                 self.grounded_timer.reset()
 
         if self.collision_directions['up']:
-            if normal_collisions:
-                self.vel[1] = 0
-            else:
-                self.vel[1] *= -self.BOUNCE
+            self.vel[1] = 0
 
         if self.collision_directions['left'] or self.collision_directions['right']:
-            if normal_collisions:
-                self.vel[0] = 0
-            else:
-                self.vel[0] *= -self.BOUNCE
-
+            self.vel[0] = 0
 
     def jump_release(self):
         if self.jumping and self.vel[1] < 0:
@@ -133,6 +119,7 @@ class Player2(Player):
         super().__init__(game, *args, **kwargs)
         self.being_pulled = False
         self.pull_request_timer = Timer(120)
+        self.bubble = None
 
     def update(self, rects=None):
         player_1 = self.game.game_map.level.player_1
@@ -153,28 +140,46 @@ class Player2(Player):
                 vel = (player_1.pos - self.pos)
                 scale_to_length(vel, self.PULL_SPEED)
                 self.vel = vel
+                self.bubble = Entity((0, 0), 'bubble', 'idle')
 
         if self.being_pulled:
-            self.collision_mode = 'soft'
             acceleration = (player_1.pos - self.pos)
             scale_to_length(acceleration, self.PULL_ACCELERATION)
             self.vel += acceleration
             if self.vel.length() > self.PULL_SPEED:
                 scale_to_length(self.vel, self.PULL_SPEED)
 
-        else:
-            pass
-            self.collision_mode = 'hard'
 
 
         self.pull_request_timer.update()
 
-        super().update(actions, rects, normal_collisions=not self.being_pulled)
+        # super().update(actions, rects, normal_collisions=not self.being_pulled)
+        if self.being_pulled:
+            self.collision_mode = 'hard'
+            PhysicsEntity.update(self, rects)
+        else:
+            self.collision_mode = 'hard'
+            super().update(actions, rects)
 
-        if (Vec2(self.rect.center) - player_1.rect.center).length() < 10 and not any(self.collision_directions.values()):
-            self.being_pulled = False
-            self.pull_request_timer.reset(done=True)
-            player_1.pull_request_timer.reset(done=True)
+        if self.being_pulled:
+            # input(self.collision_directions)
+            if (Vec2(self.rect.center) - player_1.rect.center).length() < 10 or any(self.collision_directions.values()):
+                self.being_pulled = False
+                self.pull_request_timer.reset(done=True)
+                player_1.pull_request_timer.reset(done=True)
+                self.bubble.animation.set_action('pop')
+
+        if self.bubble:
+            done = self.bubble.update()
+            if done and self.bubble.animation.action == 'pop':
+                self.bubble = None
+
 
     def pull_request(self):
         self.pull_request_timer.reset()
+
+    def render(self, surf, offset):
+        super().render(surf, offset)
+        if self.bubble:
+            self.bubble.real_pos = self.rect.center - 0.5*Vec2(self.bubble.rect.size)
+            self.bubble.render(surf, offset)

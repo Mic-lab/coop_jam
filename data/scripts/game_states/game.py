@@ -23,6 +23,7 @@ class Game(State):
 
 
         self.game_surf.fill((5, 6, 8))
+        self.game_surf.fill((110, 110, 115))
 
         # Update Buttons
         for key, btn in self.buttons.items():
