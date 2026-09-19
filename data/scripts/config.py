@@ -10,4 +10,5 @@ screen_size = scale*GAME_SIZE[0], scale*GAME_SIZE[1]
 
 fps = 60
 
+
 TILE_SIZE = Vec2(16, 16)

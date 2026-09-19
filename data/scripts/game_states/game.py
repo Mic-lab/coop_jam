@@ -4,6 +4,7 @@ from .state import State
 from ..button import Button
 from ..font import fonts
 from ..game_map import GameMap
+from .. import colors
 
 class Game(State):
 
@@ -23,7 +24,7 @@ class Game(State):
 
 
         self.game_surf.fill((5, 6, 8))
-        self.game_surf.fill((110, 110, 115))
+        self.game_surf.fill(colors.GRAY_3)
 
         # Update Buttons
         for key, btn in self.buttons.items():

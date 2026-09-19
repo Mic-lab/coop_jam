@@ -94,12 +94,12 @@ class Player1(Player):
 
     def update(self, rects=None):
 
-        if self.game.inputs['pressed'].get('b'):
+        if self.game.inputs['pressed'].get('e'):
             self.pull_request_timer.reset()
 
         actions = {
-                'jump_pressed': self.game.inputs['pressed'].get('v'),
-                'jump_released': self.game.inputs['released'].get('v'),
+                'jump_pressed': self.game.inputs['pressed'].get('w'),
+                'jump_released': self.game.inputs['released'].get('w'),
                 'move_left': self.game.inputs['held'].get('a'),
                 'move_right': self.game.inputs['held'].get('d'),
                 }
@@ -125,22 +125,25 @@ class Player2(Player):
         player_1 = self.game.game_map.level.player_1
 
         actions = {
-                'jump_pressed': False,
-                'jump_released': False,
-                'move_left': False,
-                'move_right': False,
+                'jump_pressed': self.game.inputs['pressed'].get('up'),
+                'jump_released': self.game.inputs['released'].get('up'),
+                'move_left': self.game.inputs['held'].get('left'),
+                'move_right': self.game.inputs['held'].get('right'),
                 }
 
-        if self.game.inputs['pressed'].get('m'):
+        if self.game.inputs['pressed'].get('/'):
             self.pull_request()
 
-        if not self.pull_request_timer.done:
+        if not self.pull_request_timer.done or 1:  # TMP
             if not player_1.pull_request_timer.done:
                 self.being_pulled = True
                 vel = (player_1.pos - self.pos)
                 scale_to_length(vel, self.PULL_SPEED)
                 self.vel = vel
                 self.bubble = Entity((0, 0), 'bubble', 'idle')
+
+                self.pull_request_timer.reset(done=True)
+                player_1.pull_request_timer.reset(done=True)
 
         if self.being_pulled:
             acceleration = (player_1.pos - self.pos)
@@ -156,6 +159,21 @@ class Player2(Player):
         # super().update(actions, rects, normal_collisions=not self.being_pulled)
         if self.being_pulled:
             self.collision_mode = 'hard'
+
+            vel_change = Vec2()
+            if self.game.inputs['held'].get('up'):
+                vel_change[1] -= 1
+            if self.game.inputs['held'].get('down'):
+                vel_change[1] += 1
+            if self.game.inputs['held'].get('right'):
+                vel_change[0] += 1
+            if self.game.inputs['held'].get('left'):
+                vel_change[0] -= 1
+
+            print(vel_change)
+            scale_to_length(vel_change, 0.16)
+            self.vel += vel_change
+
             PhysicsEntity.update(self, rects)
         else:
             self.collision_mode = 'hard'
@@ -165,8 +183,6 @@ class Player2(Player):
             # input(self.collision_directions)
             if (Vec2(self.rect.center) - player_1.rect.center).length() < 10 or any(self.collision_directions.values()):
                 self.being_pulled = False
-                self.pull_request_timer.reset(done=True)
-                player_1.pull_request_timer.reset(done=True)
                 self.bubble.animation.set_action('pop')
 
         if self.bubble:
