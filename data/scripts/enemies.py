@@ -36,9 +36,21 @@ class Enemy(PhysicsEntity):
 
         self.coord = self.pos - 0.5*Vec2(self.img.get_size())
 
+        if self.vel[0] < 0:
+            self.animation.flip[0] = True
+        elif self.vel[0] > 0:
+            self.animation.flip[0] = False
+
         return {
                 'remove': self.dead
                 }
+
+    @property
+    def angle(self):
+        angle = super().angle
+        if self.vel[0] > 0:
+            return angle
+        return 180-abs(angle)
 
     def on_collision(self, entity):
         # if not isinstance(entity, Player): return

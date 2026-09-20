@@ -81,7 +81,7 @@ class ParticleGenerator:
             },
         'dust': {
             'base_particle': lambda: Particle(action='dust', vel=(0, 0), acceleration=0.1),
-            'vel_randomness': 3,
+            'vel_randomness': 2,
             'rate': 4,
             'duration': 6,
             }
