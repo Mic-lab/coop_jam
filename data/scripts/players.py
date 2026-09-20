@@ -122,8 +122,10 @@ class Player2(Player):
         self.being_pulled = False
         self.pull_request_timer = Timer(120)
         self.bubble = None
+        self.kill = 0
 
     def update(self, rects=None):
+        self.kills = 0
         player_1 = self.game.game_map.level.player_1
 
         actions = {
@@ -140,7 +142,10 @@ class Player2(Player):
             if not player_1.pull_request_timer.done:
                 self.being_pulled = True
                 vel = (player_1.pos - self.pos)
+
                 scale_to_length(vel, self.PULL_SPEED)
+                # vel *= 0.8
+
                 self.vel = vel
                 self.bubble = Entity((0, 0), 'bubble', 'idle')
 
@@ -205,6 +210,7 @@ class Player2(Player):
     def on_collision(self, entity):
         if entity.name == 'ghost':
             if self.being_pulled:
+                self.game.game_map.level.combo_manager.add_kills(1)
                 sfx.sounds[f'kill_{random.randint(1, 4)}.wav'].play()
                 self.vel *= -1  # NOTE: only goes as far as speed cap allows
                 self.game.end_freeze(4)
@@ -215,6 +221,7 @@ class Player2(Player):
         return super().on_collision(entity)
 
     def reset_pull(self):
+        self.game.game_map.level.combo_manager.end_combo()
         sfx.sounds[f'pop.wav'].play()
         self.being_pulled = False
         self.bubble.animation.set_action('pop')

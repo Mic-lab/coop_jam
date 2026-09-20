@@ -20,6 +20,17 @@ def load_sounds():
         full_file = os.path.join(SOUNDS_DIR, file)
         sound = pygame.mixer.Sound(full_file)
         print(f'Loading {file}')
+
+        if file == 'pop.wav':
+            v = 0.4
+        if file.startswith('kill'):
+            v = 0.8
+        else:
+            v = 0.6
+
+
+        sound.set_volume(v)
+
         sounds[file] = sound
     return sounds
 

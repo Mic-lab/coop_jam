@@ -7,12 +7,14 @@ from . import config
 from .players import Player1, Player2
 from .particle import ParticleGenerator
 from .mgl import shader_handler
+from .combo_manager import ComboManager
 
 class Level:
 
     def __init__(self, game_map):
         self.game_map = game_map
         self.load()
+        self.combo_manager = ComboManager()
 
     def load(self):
 
@@ -91,6 +93,7 @@ class Level:
 
         ParticleGenerator.update_generators(self.particle_gens)
 
+        self.combo_manager.update()
 
     def render(self, surf):
         rounded_offset = Vec2(int(self.offset[0]), int(self.offset[1]))
@@ -103,6 +106,8 @@ class Level:
 
         for gen in self.particle_gens:
             gen.render(surf, offset=rounded_offset)
+
+        self.combo_manager.render(surf, (0, 0))
 
 class GameMap:
 

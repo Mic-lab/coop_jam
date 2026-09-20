@@ -78,6 +78,7 @@ void main() {
         // else {
         //     f_color.rgb = vec3(PURPLE_1);
         // }
+        f_color.gr *= 1-centerDist;
 
     }
 
