@@ -83,6 +83,9 @@ class GameHandler:
     def run(self):
         self.running = True
 
+        shader_handler.surf_data['noiseTex'] = {'repeat_x': True, 'repeat_y': True}
+        shader_handler.surfs['noiseTex'] = Animation.img_db['perlin_noise']
+
         while self.running:
             self.handle_input()
 

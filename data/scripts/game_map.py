@@ -6,6 +6,7 @@ from .entity import Entity
 from . import config
 from .players import Player1, Player2
 from .particle import ParticleGenerator
+from .mgl import shader_handler
 
 class Level:
 
@@ -19,24 +20,13 @@ class Level:
 
 
 
-0000000000000
 
-
-
-0000000000000
-
-
-
-          000000000000000000
+              0000000                        0000000
 
 
 
 
-      000000000000
-    
-
-
-0000000000000000000000000
+00000000000000000000000000000000000000000000000000000000000000000000000000000
         '''
 
         self.particle_gens = []
@@ -124,6 +114,7 @@ class GameMap:
     def update(self):
         self.level.update()
         self.t += 1
+        shader_handler.vars['t'] = self.t
 
     def render(self, surf):
         self.level.render(surf)

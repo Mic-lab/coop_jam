@@ -1,10 +1,12 @@
 #version 330 core
 
 uniform sampler2D canvasTex;
+uniform sampler2D noiseTex;
 uniform float transitionTimer;
 uniform int transitionState;
 uniform float shakeTimer = -1.0;
 uniform float caTimer = -1.0;
+uniform float t;
 in vec2 uvs;
 out vec4 f_color;
 
@@ -12,6 +14,10 @@ const float PI = 3.14159265359;
 const vec2 gridSize = vec2(64, 64);
 const float caCoef = 0.005;
 const float shakeCoef = 0.01;
+
+const vec2 screenSize = vec2(640, 360);
+const vec3 PURPLE_1 = vec3(75, 65, 88)/255;
+const vec3 PURPLE_2 = vec3(53, 43, 66)/255;
 
 vec2 rotateVec(vec2 vec, float theta) {
     return vec.x * vec2(cos(theta), sin(theta))
@@ -24,6 +30,11 @@ float linearEase(float x) {
 
 void main() {
     f_color = vec4(texture(canvasTex, uvs).rgb, 1.0);
+
+    vec2 uvsS = vec2(uvs.x, uvs.y * screenSize.y/screenSize.x);
+    vec2 uvsPx = vec2(floor(uvs*screenSize)/screenSize);
+    vec2 uvsSPx = vec2(uvsPx.x, uvsPx.y * (screenSize.y/screenSize.x));
+
     float centerDist = distance(uvs, vec2(0.5, 0.5));
 
     // Blurry shake
@@ -48,6 +59,29 @@ void main() {
         f_color.g = caSample2;
         f_color.b = caSample3;
     }
+
+    if (f_color.rgb == vec3(0)) {
+        float n1 = texture(noiseTex, uvsSPx + vec2(0.31, 0.37) + 0.001*vec2(t)).r;
+        float n2 = texture(noiseTex, uvsSPx - 0.001*vec2(t)).r;
+        float n = clamp(n1+n2, 0, 1);
+
+        float c = smoothstep(0.8, 1.0, uvsPx.y);
+        float k = smoothstep(0.3, 1.0, uvsPx.y);
+
+        float v = clamp(c+c*n, 0, 1);
+
+        f_color.rgb = mix(PURPLE_1, PURPLE_2, v);
+
+        // if (v > 0.5) {
+        //     f_color.rgb = vec3(PURPLE_2);
+        // }
+        // else {
+        //     f_color.rgb = vec3(PURPLE_1);
+        // }
+
+    }
+
+    f_color.b *= 1+(0.2*centerDist);
 
     /*
     0  No transition

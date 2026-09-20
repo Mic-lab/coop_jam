@@ -50,7 +50,7 @@ class Enemy(PhysicsEntity):
         angle = super().angle
         if self.vel[0] > 0:
             return angle
-        return 180-abs(angle)
+        return 180+angle
 
     def on_collision(self, entity):
         # if not isinstance(entity, Player): return

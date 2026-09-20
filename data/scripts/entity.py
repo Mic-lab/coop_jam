@@ -148,7 +148,7 @@ class PhysicsEntity(Entity):
                     if direction:
                         self.collision_directions[direction] = True
                 self.collided_tiles.add(tile)
-                return
+                # return
 
     def handle_coord_collision(self, tile):
         return self.rect.colliderect(tile.rect)

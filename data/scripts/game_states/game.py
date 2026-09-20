@@ -14,7 +14,6 @@ class Game(State):
 
         rects = [pygame.Rect(30, 30+i*30, 80, 20) for i in range(4)]
         self.buttons = {
-            'menu': Button(rects[0], 'back', 'basic'),
         }
 
         self.game_map = GameMap(self)
@@ -36,6 +35,7 @@ class Game(State):
 
         self.game_surf.fill((5, 6, 8))
         self.game_surf.fill(colors.GRAY_3)
+        self.game_surf.fill((0, 0, 0))
 
         # Update Buttons
         for key, btn in self.buttons.items():

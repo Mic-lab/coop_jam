@@ -1,6 +1,8 @@
 from pygame import Vector2 as Vec2
 from .entity import PhysicsEntity, Entity
 from .timer import Timer
+import random
+from . import sfx
 
 def scale_to_length(vector, length):
     if not vector: return vector
@@ -178,10 +180,12 @@ class Player2(Player):
             self.collision_mode = 'hard'
             super().update(actions, rects)
 
+        '''
         if self.being_pulled:
             # input(self.collision_directions)
             if (Vec2(self.rect.center) - player_1.rect.center).length() < 10:
                 self.reset_pull()
+        '''
 
         if self.bubble:
             done = self.bubble.update()
@@ -201,6 +205,7 @@ class Player2(Player):
     def on_collision(self, entity):
         if entity.name == 'ghost':
             if self.being_pulled:
+                sfx.sounds[f'kill_{random.randint(1, 4)}.wav'].play()
                 self.vel *= -1  # NOTE: only goes as far as speed cap allows
                 self.game.end_freeze(4)
         else:
@@ -210,6 +215,7 @@ class Player2(Player):
         return super().on_collision(entity)
 
     def reset_pull(self):
+        sfx.sounds[f'pop.wav'].play()
         self.being_pulled = False
         self.bubble.animation.set_action('pop')
 
