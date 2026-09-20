@@ -4,11 +4,14 @@ from pygame import Vector2
 from .animation import Animation
     
 class Entity:
-    def __init__(self, pos, name, action=None):
+    def __init__(self, pos, name, action=None, collision_mode='hard'):
         self.real_pos = Vector2(pos)
         self.name = name
         self.animation = Animation(name, action)
         self.flip = [False, False]
+        self.is_solid = True
+        self.stop_on_collision = True
+        self.collision_mode = collision_mode
 
     @property
     def pos(self):
@@ -50,6 +53,8 @@ class Entity:
     def __repr__(self):
         return f'<{self.name}>'
 
+    def on_collision(self, entity): pass
+
 class PhysicsEntity(Entity):
 
     def __init__(self, vel=(0, 0), acceleration=(0, 0), max_vel=9999, collision_mode='hard', *args, **kwargs):
@@ -62,6 +67,7 @@ class PhysicsEntity(Entity):
                                      'right': False,
                                      'down': False,
                                      'left': False}
+        self.collided_tiles = set()
 
     @property
     def angle(self):
@@ -70,6 +76,8 @@ class PhysicsEntity(Entity):
 
     def update(self, rects=None):
         output = super().update()
+
+        self.collided_tiles = set()
 
         self.move(rects)
         self.vel += self.acceleration
@@ -91,6 +99,10 @@ class PhysicsEntity(Entity):
         for axis in range(2):
             self.resolve_collisions(axis, rects)
 
+        for tile in self.collided_tiles:
+            tile.on_collision(self)
+            self.on_collision(tile)
+
     def resolve_collisions(self, axis, rects):
         # NOTE: Instead of breaking when finding tiles, it can also be useful
         # to append all collided tiles to the collisions directions
@@ -99,7 +111,11 @@ class PhysicsEntity(Entity):
         direction = None
         for tile in rects:
             rect = tile.rect
-            if self.rect.colliderect(rect):
+            if hasattr(tile, 'coord'):
+                collide_condition = self.handle_coord_collision(tile)
+            else:
+                collide_condition = self.rect.colliderect(rect)
+            if collide_condition:
                 if axis == 0:
                     if self.vel[0] > 0:
                         delta = self.rect.right - rect.left
@@ -110,6 +126,7 @@ class PhysicsEntity(Entity):
                     else:
                         delta = 0
                         print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
+                    if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
                 elif axis == 1:
                     if self.vel[1] < 0:
                         delta = self.rect.top - rect.bottom
@@ -120,14 +137,19 @@ class PhysicsEntity(Entity):
                     else:
                         delta = 0
                         print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
+                    if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
 
-                if self.collision_mode == 'hard':
+                if tile.collision_mode == 'hard':
                     v = Vector2(0, 0)
                     v[axis] = delta
-                    self.change_pos(-v)
+                    if tile.is_solid:
+                        self.change_pos(-v)
 
-
-                if direction: self.collision_directions[direction] = True
+                    if direction:
+                        self.collision_directions[direction] = True
+                self.collided_tiles.add(tile)
                 return
 
+    def handle_coord_collision(self, tile):
+        return self.rect.colliderect(tile.rect)
 

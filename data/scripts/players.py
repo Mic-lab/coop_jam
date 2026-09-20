@@ -9,7 +9,7 @@ def scale_to_length(vector, length):
 class Player(PhysicsEntity):
     
     BOUNCE = 0.9
-    GRAVITY_UP = 0.2
+    GRAVITY_UP = 0.15
     GRAVITY_DOWN = 0.4
 
     def __init__(self, game, *args, **kwargs):
@@ -17,8 +17,8 @@ class Player(PhysicsEntity):
         super().__init__(*args, **kwargs)
         self.grounded = False
         self.jumping = False
-        self.jump_timer = Timer(12, done=True)  # Jump buffer
-        self.grounded_timer = Timer(12, done=True)  # Coyote time
+        self.jump_timer = Timer(5, done=True)  # Jump buffer
+        self.grounded_timer = Timer(5, done=True)  # Coyote time
 
     @property
     def jump_rising(self):
@@ -62,18 +62,18 @@ class Player(PhysicsEntity):
         if self.collision_directions['down']:
             self.grounded = True
             if not started_jump:
-                self.vel[1] = 0
+                # self.vel[1] = 0
                 self.jumping = False
         else:
             if self.grounded:
                 self.grounded = False
                 self.grounded_timer.reset()
-
-        if self.collision_directions['up']:
-            self.vel[1] = 0
-
-        if self.collision_directions['left'] or self.collision_directions['right']:
-            self.vel[0] = 0
+        #
+        # if self.collision_directions['up']:
+        #     self.vel[1] = 0
+        #
+        # if self.collision_directions['left'] or self.collision_directions['right']:
+        #     self.vel[0] = 0
 
     def jump_release(self):
         if self.jumping and self.vel[1] < 0:
@@ -170,7 +170,6 @@ class Player2(Player):
             if self.game.inputs['held'].get('left'):
                 vel_change[0] -= 1
 
-            print(vel_change)
             scale_to_length(vel_change, 0.16)
             self.vel += vel_change
 
@@ -181,9 +180,8 @@ class Player2(Player):
 
         if self.being_pulled:
             # input(self.collision_directions)
-            if (Vec2(self.rect.center) - player_1.rect.center).length() < 10 or any(self.collision_directions.values()):
-                self.being_pulled = False
-                self.bubble.animation.set_action('pop')
+            if (Vec2(self.rect.center) - player_1.rect.center).length() < 10:
+                self.reset_pull()
 
         if self.bubble:
             done = self.bubble.update()
@@ -199,3 +197,23 @@ class Player2(Player):
         if self.bubble:
             self.bubble.real_pos = self.rect.center - 0.5*Vec2(self.bubble.rect.size)
             self.bubble.render(surf, offset)
+
+    def on_collision(self, entity):
+        if entity.name == 'ghost':
+            if self.being_pulled:
+                self.vel *= -1  # NOTE: only goes as far as speed cap allows
+                self.game.end_freeze(4)
+        else:
+            if self.being_pulled:
+                self.reset_pull()
+
+        return super().on_collision(entity)
+
+    def reset_pull(self):
+        self.being_pulled = False
+        self.bubble.animation.set_action('pop')
+
+    BUBBLE_SIZE = 16
+
+    def handle_coord_collision(self, tile):
+        return (Vec2(self.rect.center) - tile.center).length() < (self.BUBBLE_SIZE+5)

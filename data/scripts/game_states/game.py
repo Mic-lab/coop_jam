@@ -5,6 +5,7 @@ from ..button import Button
 from ..font import fonts
 from ..game_map import GameMap
 from .. import colors
+from ..timer import Timer
 
 class Game(State):
 
@@ -17,10 +18,20 @@ class Game(State):
         }
 
         self.game_map = GameMap(self)
+        self.freeze_timer = Timer(0, done=True)
+        self.pending_freeze = 0
+
+    def freeze(self, duration=5):
+        self.freeze_timer = Timer(duration)
+
+    def end_freeze(self, duration=5):
+        if self.pending_freeze and duration < self.pending_freeze:
+            return
+        self.pending_freeze = duration
 
     def sub_update(self):
 
-        self.game_map.update()
+        if self.freeze_timer.done: self.game_map.update()
 
 
         self.game_surf.fill((5, 6, 8))
@@ -28,7 +39,8 @@ class Game(State):
 
         # Update Buttons
         for key, btn in self.buttons.items():
-            btn.update(self.inputs)
+            if self.freeze_timer.done:
+                btn.update(self.inputs)
             btn.render(self.game_surf)
 
             if btn.clicked:
@@ -36,3 +48,8 @@ class Game(State):
                     self.handler.transition_to(self.handler.states.Menu)
 
         self.game_map.render(self.game_surf)
+        self.freeze_timer.update()
+
+        if self.pending_freeze:
+            self.freeze(self.pending_freeze)
+            self.pending_freeze = 0

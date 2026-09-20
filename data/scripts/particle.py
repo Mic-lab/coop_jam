@@ -1,7 +1,7 @@
 import random
 from .timer import Timer
 from .entity import PhysicsEntity
-from . import utils
+from . import utils, colors
 from copy import deepcopy
 import pygame
 from pygame import Vector2
@@ -11,12 +11,13 @@ class Particle(PhysicsEntity):
     ANGLE_ROUNDING = 10
     cache = {}
 
-    def __init__(self, pos=(0, 0), angled=False, color=None, *args, **kwargs):
+    def __init__(self, pos=(0, 0), angled=False, color=None, friction=1, *args, **kwargs):
         name = 'particles'
         super().__init__(pos=pos, name=name, *args, **kwargs)
         self.angled = angled
         self.color = color
         self.alive = True
+        self.friction = friction
 
     @property
     def cache_key(self):
@@ -45,6 +46,7 @@ class Particle(PhysicsEntity):
 
     def update(self, *args, **kwargs):
         self.alive = not super().update(*args, **kwargs)
+        self.vel *= self.friction
 
     def copy(self):
         return deepcopy(self)
@@ -71,6 +73,18 @@ class ParticleGenerator:
             'inverse_rate': True,
             'duration': None,
         },
+        'kill': {
+            'base_particle': lambda: Particle(action='kill', vel=(0, 0), angled=True),
+            'vel_randomness': 0.5,
+            'rate': 4,
+            'duration': 1,
+            },
+        'dust': {
+            'base_particle': lambda: Particle(action='dust', vel=(0, 0), acceleration=0.1),
+            'vel_randomness': 3,
+            'rate': 4,
+            'duration': 6,
+            }
     }
 
     @classmethod
@@ -92,20 +106,13 @@ class ParticleGenerator:
 
     def generate_particle(self):
         particle = self.base_particle()
-        particle.real_pos = self.pos - 0.5 * Vector2(particle.animation.size)
         vel_offset = random.uniform(0, self.vel_randomness) * Vector2(1, 0)
         vel_offset = vel_offset.rotate(random.uniform(0, 360))
         particle.vel += vel_offset
+        particle.real_pos = self.pos - 0.5 * Vector2(particle.img.get_size())
         return particle
 
     def update(self):
-        if not self.timer.done:
-            if not self.inverse_rate:
-                for _ in range(self.rate):
-                    self.particles.append(self.generate_particle())
-            else:
-                if self.timer.frame % self.rate == 0:
-                    self.particles.append(self.generate_particle())
 
         new_particles = []
         for particle in self.particles:
@@ -117,11 +124,20 @@ class ParticleGenerator:
         self.done = self.timer.done and not self.particles
         if self.done:
             return True
+
+        if not self.timer.done:
+            if not self.inverse_rate:
+                for _ in range(self.rate):
+                    self.particles.append(self.generate_particle())
+            else:
+                if self.timer.frame % self.rate == 0:
+                    self.particles.append(self.generate_particle())
+
         if not self.timer.done: self.timer.update()
 
-    def render(self, surf):
+    def render(self, surf, offset):
         for particle in self.particles:
-            particle.render(surf)
+            particle.render(surf, offset)
 
     @staticmethod
     def update_generators(generators):
