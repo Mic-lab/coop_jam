@@ -1,4 +1,5 @@
 import pygame
+import random
 from pygame import Vector2 as Vec2
 from .timer import Timer
 from .font import fonts
@@ -26,4 +27,5 @@ class ComboManager:
         scale = (lerp(1/3, 1, x), lerp(3, 1, x))
         scale = (lerp(3, 1, x), lerp(1/3, 1, x))
         img = pygame.transform.scale(img, (img.get_width()*scale[0], img.get_height()*scale[1]))
+        img = pygame.transform.rotate(img, lerp(random.randint(-40, 40), 0, x))
         surf.blit(img, (400, 50) - 0.5*Vec2(img.get_size()))

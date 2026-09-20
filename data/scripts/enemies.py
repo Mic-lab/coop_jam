@@ -70,7 +70,7 @@ class Enemy(PhysicsEntity):
                 'kill',
                 # rate=1,
                 # vel_randomness=9,
-                base_particle=lambda: Particle(action='kill', vel=vel, color=colors.RED, angled=True)
+                base_particle=lambda: Particle(action='kill', vel=vel*0.5, angled=True)
                 )
         )
 

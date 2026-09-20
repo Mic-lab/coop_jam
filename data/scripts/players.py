@@ -213,7 +213,7 @@ class Player2(Player):
                 self.game.game_map.level.combo_manager.add_kills(1)
                 sfx.sounds[f'kill_{random.randint(1, 4)}.wav'].play()
                 self.vel *= -1  # NOTE: only goes as far as speed cap allows
-                self.game.end_freeze(4)
+                self.game.end_freeze(3)
         else:
             if self.being_pulled:
                 self.reset_pull()

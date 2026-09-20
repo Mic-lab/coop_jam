@@ -75,8 +75,8 @@ class ParticleGenerator:
         },
         'kill': {
             'base_particle': lambda: Particle(action='kill', vel=(0, 0), angled=True),
-            'vel_randomness': 0.5,
-            'rate': 4,
+            'vel_randomness': 0,
+            'rate': 1,
             'duration': 1,
             },
         'dust': {
