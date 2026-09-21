@@ -7,6 +7,8 @@ uniform int transitionState;
 uniform float shakeTimer = -1.0;
 uniform float caTimer = -1.0;
 uniform float t;
+uniform float killTimer = -1.0;
+uniform float comboShowTimer = -1.0;
 in vec2 uvs;
 out vec4 f_color;
 
@@ -18,6 +20,8 @@ const float shakeCoef = 0.01;
 const vec2 screenSize = vec2(640, 360);
 const vec3 PURPLE_1 = vec3(75, 65, 88)/255;
 const vec3 PURPLE_2 = vec3(53, 43, 66)/255;
+const vec3 WHITE    = vec3(242, 240, 229)/255;
+const vec3 RED_1    = vec3(105, 6, 33)/255;
 
 vec2 rotateVec(vec2 vec, float theta) {
     return vec.x * vec2(cos(theta), sin(theta))
@@ -34,6 +38,7 @@ void main() {
     vec2 uvsS = vec2(uvs.x, uvs.y * screenSize.y/screenSize.x);
     vec2 uvsPx = vec2(floor(uvs*screenSize)/screenSize);
     vec2 uvsSPx = vec2(uvsPx.x, uvsPx.y * (screenSize.y/screenSize.x));
+    vec2 uvsScreen = uvs*screenSize;
 
     float centerDist = distance(uvs, vec2(0.5, 0.5));
 
@@ -78,6 +83,32 @@ void main() {
         // else {
         //     f_color.rgb = vec3(PURPLE_1);
         // }
+    }
+
+    if (uvsScreen.y > 40 && uvsScreen.y < 55) {
+
+        if (length(f_color.rgb - WHITE) > 0.001) {
+
+            float n = texture(noiseTex, 5*(uvsSPx+vec2(0.002*t, 0))).r;
+
+            float k = pow(killTimer, 0.5) + 0.00001*comboShowTimer;
+
+            float leftBound = mix(1, mix(0.4, 0.6, k), comboShowTimer);
+            float rightBound = mix(1, 0.8, comboShowTimer);
+            float nIntensity = smoothstep(leftBound, rightBound, uvsPx.x);
+
+            float finalIntensity = nIntensity*n;
+
+            if (finalIntensity > 0.2) {
+                f_color.rgb = RED_1;
+            }
+
+
+            // f_color.r *= 1+intensity + nIntensity*n;
+            // f_color.r *= 1+intensity + nIntensity*n;
+
+        }
+
     }
 
     /*
