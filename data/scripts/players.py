@@ -110,6 +110,12 @@ class Player1(Player):
 
         super().update(actions, rects)
 
+        if self.vel[0] < 0:
+            self.animation.flip[0] = True
+        elif self.vel[0] > 0:
+            self.animation.flip[0] = False
+
+
 
 
 class Player2(Player):
@@ -196,6 +202,11 @@ class Player2(Player):
             done = self.bubble.update()
             if done and self.bubble.animation.action == 'pop':
                 self.bubble = None
+
+        if self.vel[0] < 0:
+            self.animation.flip[0] = True
+        elif self.vel[0] > 0:
+            self.animation.flip[0] = False
 
 
     def pull_request(self):
