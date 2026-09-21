@@ -87,14 +87,14 @@ class PhysicsEntity(Entity):
         return output
 
     def move(self, rects):
-        if not rects:
-            self.real_pos += self.vel
-            return
-
         self.collision_directions = {'up': False,
                                      'right': False,
                                      'down': False,
                                      'left': False}
+
+        if not rects:
+            self.real_pos += self.vel
+            return
 
         for axis in range(2):
             self.resolve_collisions(axis, rects)
@@ -126,7 +126,6 @@ class PhysicsEntity(Entity):
                     else:
                         delta = 0
                         print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
-                    if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
                 elif axis == 1:
                     if self.vel[1] < 0:
                         delta = self.rect.top - rect.bottom
@@ -137,7 +136,6 @@ class PhysicsEntity(Entity):
                     else:
                         delta = 0
                         print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
-                    if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
 
                 if tile.collision_mode == 'hard':
                     v = Vector2(0, 0)
@@ -147,6 +145,10 @@ class PhysicsEntity(Entity):
 
                     if direction:
                         self.collision_directions[direction] = True
+
+                    if self.stop_on_collision:
+                        self.vel[axis] = 0
+
                 self.collided_tiles.add(tile)
                 # return
 
