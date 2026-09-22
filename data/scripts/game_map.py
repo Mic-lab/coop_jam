@@ -1,7 +1,8 @@
 import pygame
+import random
 from pygame import Vector2 as Vec2
 
-from data.scripts.enemies import Enemy
+from data.scripts import enemies
 from .entity import Entity
 from . import config
 from .players import Player1, Player2
@@ -21,21 +22,22 @@ class Level:
         level_content = '''
 
 
-
-
-              0000000                        0000000
-
+                       
+                       00000000000000   
 
 
 
-00000000000000000000000000000000000000000000000000000000000000000000000000000
+        00000000000000                      00000000000
+     
+     
+000000000000000000000000000000000000000000000000000000000000000000000000000000000000
         '''
 
         self.particle_gens = []
         self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
         self.player_2 = Player2(self.game_map.game, name='side', pos=(30, -30), action='idle')
         self.enemies = [
-                Enemy(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
+                enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
                 ]
 
         tiles = []
@@ -87,8 +89,12 @@ class Level:
         self.offset += 0.5*(self.desired_offset-self.offset)
 
         if self.game_map.t % 120 == 0:
+            if random.randint(0,1):
+                e = enemies.DashFish(self.game_map.game, pos=(100, 0), name='dash_fish', action='idle')
+            else:
+                e = enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
             self.enemies.append(
-                Enemy(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
+                    e
                     )
 
         ParticleGenerator.update_generators(self.particle_gens)

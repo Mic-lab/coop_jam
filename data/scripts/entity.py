@@ -41,8 +41,11 @@ class Entity:
     def render(self, surf, offset=(0,0)):
         # pygame.draw.rect(surf, (255, 0, 0), self.rect)
         render_pos = self.pos + offset
+        if self.animation.flip[0]:
+            render_pos[0] += self.animation.rect.left - (self.animation.img.get_width() - self.animation.rect.right)
 
         surf.blit(self.img, render_pos)
+
         # try:
         #     pygame.draw.rect(surf, (255, 0, 0), (self.rect.x + offset[0],
         #                                          self.rect.y + offset[1],
@@ -125,7 +128,7 @@ class PhysicsEntity(Entity):
                         direction = 'left'
                     else:
                         delta = 0
-                        print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
+                        if tile.collision_mode == 'hard': print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
                     if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
                 elif axis == 1:
                     if self.vel[1] < 0:
@@ -136,7 +139,7 @@ class PhysicsEntity(Entity):
                         direction = 'down'
                     else:
                         delta = 0
-                        print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
+                        if  tile.collision_mode=='hard': print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
                     if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
 
                 if tile.collision_mode == 'hard':

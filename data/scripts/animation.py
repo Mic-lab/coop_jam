@@ -121,10 +121,10 @@ class Animation:
     @property
     def rect(self) -> pygame.Rect:
         base_rect = Animation.animation_db[self.name]['rect'].copy()
-        if any(self.flip):
-            for i, flip in enumerate(self.flip):
-                if flip:
-                    base_rect[i] = self.img.get_size()[i] - base_rect[i] - base_rect[i + 2]
+        # if any(self.flip):
+        #     for i, flip in enumerate(self.flip):
+        #         if flip:
+        #             base_rect[i] = self.img.get_size()[i] - base_rect[i] - base_rect[i + 2]
         return base_rect
  
     @property

@@ -12,7 +12,7 @@ class Player(PhysicsEntity):
     
     BOUNCE = 0.9
     GRAVITY_UP = 0.15
-    GRAVITY_DOWN = 0.4
+    GRAVITY_DOWN = 0.3
 
     def __init__(self, game, *args, **kwargs):
         self.game = game
@@ -84,7 +84,7 @@ class Player(PhysicsEntity):
 
     def start_jump(self):
         self.jump_descent = False
-        self.vel[1] = -5
+        self.vel[1] = -4
         self.jumping = True
 
 
@@ -162,8 +162,10 @@ class Player2(Player):
             acceleration = (player_1.pos - self.pos)
             scale_to_length(acceleration, self.PULL_ACCELERATION)
             self.vel += acceleration
-            if self.vel.length() > self.PULL_SPEED:
-                scale_to_length(self.vel, self.PULL_SPEED)
+            
+            # if self.vel.length() > self.PULL_SPEED:
+            #     scale_to_length(self.vel, self.PULL_SPEED)
+            self.vel *= 0.97
 
 
 
@@ -219,11 +221,11 @@ class Player2(Player):
             self.bubble.render(surf, offset)
 
     def on_collision(self, entity):
-        if entity.name == 'ghost':
+        if hasattr(entity, 'tag') and entity.tag == 'enemy':
             if self.being_pulled:
                 self.game.game_map.level.combo_manager.add_kills(1)
                 sfx.sounds[f'kill_{random.randint(1, 4)}.wav'].play()
-                self.vel *= -1  # NOTE: only goes as far as speed cap allows
+                self.vel *= -0.3  # NOTE: only goes as far as speed cap allows
                 self.game.end_freeze(3)
         else:
             if self.being_pulled:

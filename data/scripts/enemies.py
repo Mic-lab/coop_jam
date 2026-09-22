@@ -4,8 +4,10 @@ from . import colors
 from .particle import ParticleGenerator, Particle
 from .players import Player, Player2
 from .entity import PhysicsEntity
+import math
+import random
 
-class Enemy(PhysicsEntity):
+class Fish(PhysicsEntity):
 
     SPEED = 2
     ACCELERATION = 0.1
@@ -20,17 +22,14 @@ class Enemy(PhysicsEntity):
         self.dead = False
         self.collision_mode = 'soft_tracked'
         self.coord = self.pos - 0.5*Vec2(self.img.get_size())
+        self.t = 0
+        self.tag = 'enemy'
+
+    def do_behavior(self):
+        pass
 
     def update(self, rects=None):
-        player_1 = self.game.game_map.level.player_1
-        player_2 = self.game.game_map.level.player_2
-
-        accel = (player_1.pos - self.pos)
-        if accel.length() > self.ACCELERATION:
-            accel.scale_to_length(self.ACCELERATION)
-        self.vel += accel
-        if self.vel.length() > self.SPEED:
-            self.vel.scale_to_length(self.SPEED)
+        self.do_behavior()
 
         super().update(rects)
 
@@ -55,11 +54,20 @@ class Enemy(PhysicsEntity):
     def on_collision(self, entity):
         # if not isinstance(entity, Player): return
         #
-        if isinstance(entity, Player2):
-            if entity.being_pulled:
+
+
+        hit = False
+        if isinstance(entity, Player):
+            if isinstance(entity, Player2) and entity.being_pulled:
                 print('ON COLLISION WITH P2')
                 self.die(entity.vel)
-                entity.vel *= -0.5
+            else:
+                hit = True
+
+        if hit:
+            pass
+
+
         return super().on_collision(entity)
 
     def die(self, vel):
@@ -107,3 +115,60 @@ class Enemy(PhysicsEntity):
     @property
     def center(self):
         return self.coord+0.5*Vec2(self.img.get_size())
+
+
+class NormalFish(Fish):
+
+    def do_behavior(self):
+        player_1 = self.game.game_map.level.player_1
+        player_2 = self.game.game_map.level.player_2
+
+        if player_2.being_pulled:
+            player = player_1
+
+        else:
+            dist_1 = Vec2(self.coord - player_1.rect.center).length()
+            dist_2 = Vec2(self.coord - player_2.rect.center).length()
+            if dist_1 < dist_2: player = player_1
+            else: player = player_2
+
+        accel = (self.coord - player.rect.center)
+        accel = (player.rect.center - self.pos)
+
+        if accel.length() > self.ACCELERATION:
+            accel.scale_to_length(self.ACCELERATION)
+        self.vel += accel
+        if self.vel.length() > self.SPEED:
+            self.vel.scale_to_length(self.SPEED)
+
+
+class DashFish(Fish):
+
+    ACCELERATION = 0.08
+
+    def __init__(self, game, *args, **kwargs):
+        super().__init__(game, *args, **kwargs)
+        self.t = 0
+
+    def do_behavior(self):
+        player_1 = self.game.game_map.level.player_1
+        player_2 = self.game.game_map.level.player_2
+
+        if player_2.being_pulled:
+            player = player_1
+
+        else:
+            dist_1 = Vec2(self.coord - player_1.rect.center).length()
+            dist_2 = Vec2(self.coord - player_2.rect.center).length()
+            if dist_1 < dist_2: player = player_1
+            else: player = player_2
+
+        accel = (self.coord - player.rect.center)
+        accel = (player.rect.center - self.pos)
+
+        if accel.length() > self.ACCELERATION:
+            accel.scale_to_length(self.ACCELERATION * (1+(math.sin((2/60)*self.t))))
+        self.vel += accel
+        self.vel *= 0.98
+
+        self.t += random.randint(1, 3)

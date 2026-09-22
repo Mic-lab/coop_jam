@@ -22,6 +22,7 @@ const vec3 PURPLE_1 = vec3(75, 65, 88)/255;
 const vec3 PURPLE_2 = vec3(53, 43, 66)/255;
 const vec3 WHITE    = vec3(242, 240, 229)/255;
 const vec3 RED_1    = vec3(105, 6, 33)/255;
+const vec3 BLACK    = vec3(33, 33, 35)/255;
 
 vec2 rotateVec(vec2 vec, float theta) {
     return vec.x * vec2(cos(theta), sin(theta))
