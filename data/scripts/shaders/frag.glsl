@@ -33,6 +33,10 @@ float linearEase(float x) {
     return -2*abs(x - 0.5) + 1;
 }
 
+float random2d(vec2 coord){
+    return fract(sin(dot(coord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 void main() {
     f_color = vec4(texture(canvasTex, uvs).rgb, 1.0);
 
@@ -111,6 +115,10 @@ void main() {
         }
 
     }
+
+    // f_color *= 1-1.1*centerDist* mix(0.5, 1, random2d(uvs));
+    // f_color *= mix(0.5, 1, random2d(uvs));
+
 
     /*
     0  No transition

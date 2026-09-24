@@ -9,7 +9,7 @@ from .players import Player1, Player2
 from .particle import ParticleGenerator
 from .mgl import shader_handler
 from .combo_manager import ComboManager
-from .orb import Orb
+from .orb import Orb, HpBar
 
 class Level:
 
@@ -27,8 +27,8 @@ class Level:
                                         
 
 
-
         00000000000000                      00000000000
+
      
      
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -37,7 +37,9 @@ class Level:
         self.particle_gens = []
         self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
         self.player_2 = Player2(self.game_map.game, name='side', pos=(30, -30), action='idle')
-        self.orb = Orb((400, 74))
+        self.orb = Orb(self, (400, 74))
+        self.hp_bar = HpBar((0, 20), 20)
+        self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
         self.enemies = [
                 enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
                 ]
@@ -81,6 +83,7 @@ class Level:
         for tile in self.tiles:
             tile.update()
         self.orb.update()
+        self.hp_bar.update()
         new_enemies = []
         for enemy in self.enemies:
             output = enemy.update([self.orb])
@@ -91,7 +94,8 @@ class Level:
 
         self.offset += 0.5*(self.desired_offset-self.offset)
 
-        if self.game_map.t % 120 == 0:
+        # if self.game_map.t % 120 == 0:
+        if self.game_map.t % 30 == 0:
             if random.randint(0, 1):
                 x = 100
             else:
@@ -122,6 +126,8 @@ class Level:
 
         for gen in self.particle_gens:
             gen.render(surf, offset=rounded_offset)
+
+        self.hp_bar.render(surf)
 
         self.combo_manager.render(surf, (0, 0))
 

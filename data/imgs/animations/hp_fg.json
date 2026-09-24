@@ -1,0 +1,23 @@
+{ "frames": [
+   {
+    "filename": "idle",
+    "frame": { "x": 0, "y": 0, "w": 165, "h": 22 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 12, "y": 0, "w": 165, "h": 22 },
+    "sourceSize": { "w": 179, "h": 24 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "hp_fg.png",
+  "format": "RGBA8888",
+  "size": { "w": 165, "h": 22 },
+  "scale": "1",
+  "slices": [
+   { "name": "rect", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 34, "y": 9, "w": 128, "h": 4 } }] }
+  ]
+ }
+}

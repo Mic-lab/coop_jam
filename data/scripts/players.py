@@ -227,7 +227,7 @@ class Player2(Player):
             if self.being_pulled:
                 self.game.game_map.level.combo_manager.add_kills(1)
                 sfx.sounds[f'kill_{random.randint(1, 4)}.wav'].play()
-                self.vel *= -0.3  # NOTE: only goes as far as speed cap allows
+                # self.vel *= -0.3
                 self.game.end_freeze(3)
         else:
             if self.being_pulled:
@@ -242,6 +242,7 @@ class Player2(Player):
         self.bubble.animation.set_action('pop')
 
     BUBBLE_SIZE = 16
+    # BUBBLE_SIZE = 64
 
     def handle_coord_collision(self, tile):
         return (Vec2(self.rect.center) - tile.center).length() < (self.BUBBLE_SIZE+5)

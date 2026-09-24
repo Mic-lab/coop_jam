@@ -24,7 +24,9 @@ def load_sounds():
         if file == 'pop.wav':
             v = 0.4
         if file.startswith('kill'):
-            v = 0.8
+            v = 1
+        if file.startswith('hit.wav'):
+            v = 0.2
         else:
             v = 0.6
 
