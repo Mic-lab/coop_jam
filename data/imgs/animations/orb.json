@@ -1,0 +1,23 @@
+{ "frames": [
+   {
+    "filename": "idle",
+    "frame": { "x": 0, "y": 0, "w": 99, "h": 102 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 14, "y": 26, "w": 99, "h": 102 },
+    "sourceSize": { "w": 128, "h": 128 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "orb.png",
+  "format": "RGBA8888",
+  "size": { "w": 99, "h": 102 },
+  "scale": "1",
+  "slices": [
+   { "name": "rect", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 62, "y": 49, "w": 5, "h": 6 } }] }
+  ]
+ }
+}

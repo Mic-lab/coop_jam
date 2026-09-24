@@ -52,41 +52,55 @@ class Fish(PhysicsEntity):
         return 180+angle
 
     def on_collision(self, entity):
-        # if not isinstance(entity, Player): return
+        if entity.tag == 'orb':
+            self.die(self.vel*0.5, attacked=True)
+
+            return super().on_collision(entity)
+
+            # if not isinstance(entity, Player): return
+            #
+
+        elif isinstance(entity, Player2) and entity.being_pulled:
+            self.die(entity.vel)
+
+
+        # hit = False
+        # if isinstance(entity, Player):
+        #     if isinstance(entity, Player2) and entity.being_pulled:
+        #         print('ON COLLISION WITH P2')
+        #         self.die(entity.vel)
+        #     else:
+        #         hit = True
+        # if hit:
+        #     pass
         #
+        #
+        # return super().on_collision(entity)
 
-
-        hit = False
-        if isinstance(entity, Player):
-            if isinstance(entity, Player2) and entity.being_pulled:
-                print('ON COLLISION WITH P2')
-                self.die(entity.vel)
-            else:
-                hit = True
-
-        if hit:
-            pass
-
-
-        return super().on_collision(entity)
-
-    def die(self, vel):
+    def die(self, vel, attacked=False):
         self.dead = True
-        self.game.game_map.level.particle_gens.append(
-        ParticleGenerator.from_template(
-                self.center,
-                'kill',
-                # rate=1,
-                # vel_randomness=9,
-                base_particle=lambda: Particle(action='kill', vel=vel*0.5, angled=True)
-                )
-        )
+        
+        if not attacked:
+            self.game.game_map.level.particle_gens.append(
+            ParticleGenerator.from_template(
+                    self.center,
+                    'kill',
+                    # rate=1,
+                    # vel_randomness=9,
+                    base_particle=lambda: Particle(action='kill', vel=vel*0.5, angled=True)
+                    )
+            )
+
+        if attacked:
+            color = colors.BLACK
+        else:
+            color = colors.DARK_RED
 
         self.game.game_map.level.particle_gens.append(
                 ParticleGenerator.from_template(
                     self.center,
                     'dust',
-                    base_particle=lambda: Particle(action='dust', vel=vel*2, angled=True, friction=0.92)
+                    base_particle=lambda: Particle(action='dust', vel=vel*2, angled=True, friction=0.92, color=color)
                     )
                 )
 
@@ -116,10 +130,7 @@ class Fish(PhysicsEntity):
     def center(self):
         return self.coord+0.5*Vec2(self.img.get_size())
 
-
-class NormalFish(Fish):
-
-    def do_behavior(self):
+    def get_target_player(self):
         player_1 = self.game.game_map.level.player_1
         player_2 = self.game.game_map.level.player_2
 
@@ -131,9 +142,18 @@ class NormalFish(Fish):
             dist_2 = Vec2(self.coord - player_2.rect.center).length()
             if dist_1 < dist_2: player = player_1
             else: player = player_2
+        return player
 
-        accel = (self.coord - player.rect.center)
-        accel = (player.rect.center - self.pos)
+    def handle_coord_collision(self, tile):
+        return (Vec2(tile.rect.center) - self.center).length() < 5
+
+class NormalFish(Fish):
+
+    def do_behavior(self):
+
+        target = self.game.game_map.level.orb
+        accel = (self.coord - target.rect.center)
+        accel = (target.rect.center - self.pos)
 
         if accel.length() > self.ACCELERATION:
             accel.scale_to_length(self.ACCELERATION)
@@ -151,20 +171,9 @@ class DashFish(Fish):
         self.t = 0
 
     def do_behavior(self):
-        player_1 = self.game.game_map.level.player_1
-        player_2 = self.game.game_map.level.player_2
-
-        if player_2.being_pulled:
-            player = player_1
-
-        else:
-            dist_1 = Vec2(self.coord - player_1.rect.center).length()
-            dist_2 = Vec2(self.coord - player_2.rect.center).length()
-            if dist_1 < dist_2: player = player_1
-            else: player = player_2
-
-        accel = (self.coord - player.rect.center)
-        accel = (player.rect.center - self.pos)
+        target = self.game.game_map.level.orb
+        accel = (self.coord - target.rect.center)
+        accel = (target.rect.center - self.pos)
 
         if accel.length() > self.ACCELERATION:
             accel.scale_to_length(self.ACCELERATION * (1+(math.sin((2/60)*self.t))))

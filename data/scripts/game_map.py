@@ -9,6 +9,7 @@ from .players import Player1, Player2
 from .particle import ParticleGenerator
 from .mgl import shader_handler
 from .combo_manager import ComboManager
+from .orb import Orb
 
 class Level:
 
@@ -23,7 +24,7 @@ class Level:
 
 
                        
-                       00000000000000   
+                                        
 
 
 
@@ -36,6 +37,7 @@ class Level:
         self.particle_gens = []
         self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
         self.player_2 = Player2(self.game_map.game, name='side', pos=(30, -30), action='idle')
+        self.orb = Orb((400, 74))
         self.enemies = [
                 enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
                 ]
@@ -78,9 +80,10 @@ class Level:
         self.player_2.update(entities)
         for tile in self.tiles:
             tile.update()
+        self.orb.update()
         new_enemies = []
         for enemy in self.enemies:
-            output = enemy.update()
+            output = enemy.update([self.orb])
             if output.get('remove'):
                 continue
             new_enemies.append(enemy)
@@ -89,10 +92,15 @@ class Level:
         self.offset += 0.5*(self.desired_offset-self.offset)
 
         if self.game_map.t % 120 == 0:
-            if random.randint(0,1):
-                e = enemies.DashFish(self.game_map.game, pos=(100, 0), name='dash_fish', action='idle')
+            if random.randint(0, 1):
+                x = 100
             else:
-                e = enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
+                x = 700
+
+            if random.randint(0,1):
+                e = enemies.DashFish(self.game_map.game, pos=(x, 0), name='dash_fish', action='idle')
+            else:
+                e = enemies.NormalFish(self.game_map.game, pos=(x, 0), name='ghost', action='idle')
             self.enemies.append(
                     e
                     )
@@ -103,6 +111,8 @@ class Level:
 
     def render(self, surf):
         rounded_offset = Vec2(int(self.offset[0]), int(self.offset[1]))
+        self.orb.render(surf, offset=rounded_offset)
+
         self.player_1.render(surf, offset=rounded_offset)
         self.player_2.render(surf, offset=rounded_offset)
         for tile in self.tiles:

@@ -12,6 +12,7 @@ class Entity:
         self.is_solid = True
         self.stop_on_collision = True
         self.collision_mode = collision_mode
+        self.tag = None
 
     @property
     def pos(self):
@@ -115,6 +116,8 @@ class PhysicsEntity(Entity):
         for tile in rects:
             rect = tile.rect
             if hasattr(tile, 'coord'):
+                collide_condition = self.handle_coord_collision(tile)
+            elif hasattr(self, 'coord'):
                 collide_condition = self.handle_coord_collision(tile)
             else:
                 collide_condition = self.rect.colliderect(rect)

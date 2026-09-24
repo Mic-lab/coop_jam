@@ -85,6 +85,7 @@ class Player(PhysicsEntity):
     def start_jump(self):
         self.jump_descent = False
         self.vel[1] = -4
+        self.vel[1] = -5
         self.jumping = True
 
 
@@ -121,6 +122,7 @@ class Player1(Player):
 class Player2(Player):
 
     PULL_SPEED = 5
+    PULL_SPEED = 8
     PULL_ACCELERATION = 0.2
 
     def __init__(self, game, *args, **kwargs):
