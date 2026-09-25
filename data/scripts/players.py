@@ -19,8 +19,8 @@ class Player(PhysicsEntity):
         super().__init__(*args, **kwargs)
         self.grounded = False
         self.jumping = False
-        self.jump_timer = Timer(5, done=True)  # Jump buffer
-        self.grounded_timer = Timer(5, done=True)  # Coyote time
+        self.jump_timer = Timer(12, done=True)  # Jump buffer
+        self.grounded_timer = Timer(6, done=True)  # Coyote time
 
     @property
     def jump_rising(self):
@@ -97,8 +97,8 @@ class Player1(Player):
 
     def update(self, rects=None):
 
-        if self.game.inputs['pressed'].get('e'):
-            self.pull_request_timer.reset()
+        # if self.game.inputs['pressed'].get('e'):
+        #     self.pull_request_timer.reset()
 
         actions = {
                 'jump_pressed': self.game.inputs['pressed'].get('w'),
@@ -133,6 +133,7 @@ class Player2(Player):
         self.kill = 0
 
     def update(self, rects=None):
+        level = self.game.game_map.level
         self.kills = 0
         player_1 = self.game.game_map.level.player_1
 
@@ -143,27 +144,32 @@ class Player2(Player):
                 'move_right': self.game.inputs['held'].get('right'),
                 }
 
+        if actions.get('move_left'):
+            level.shop.hide()
+        elif actions.get('move_right'):
+            level.shop.show()
+
         if self.game.inputs['pressed'].get('/'):
             self.pull_request()
 
-        if not self.pull_request_timer.done or 1:  # TMP
-            if not player_1.pull_request_timer.done:
-                self.being_pulled = True
-                vel = (player_1.pos - self.pos)
+        if not self.pull_request_timer.done:  # TMP
+            # if not player_1.pull_request_timer.done:
+            self.being_pulled = True
+            vel = (Vec2(player_1.rect.center) - self.rect.center)
 
-                scale_to_length(vel, self.PULL_SPEED)
-                # vel *= 0.8
+            scale_to_length(vel, self.PULL_SPEED)
+            # vel *= 0.8
 
-                self.vel = vel
-                self.bubble = Entity((0, 0), 'bubble', 'idle')
+            self.vel = vel
+            self.bubble = Entity((0, 0), 'bubble', 'idle')
 
-                self.pull_request_timer.reset(done=True)
-                player_1.pull_request_timer.reset(done=True)
+            self.pull_request_timer.reset(done=True)
+            player_1.pull_request_timer.reset(done=True)
 
         if self.being_pulled:
-            acceleration = (player_1.pos - self.pos)
+            acceleration = (Vec2(player_1.rect.center) - self.rect.center)
             scale_to_length(acceleration, self.PULL_ACCELERATION)
-            self.vel += acceleration
+            # self.vel += acceleration
             
             # if self.vel.length() > self.PULL_SPEED:
             #     scale_to_length(self.vel, self.PULL_SPEED)

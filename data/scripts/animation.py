@@ -61,8 +61,8 @@ class Animation:
             else:
                 default_action = next(iter(frames_data))
             default_img = frames_data[default_action][0]['img']
-            print(f'[Warning] No slice for {config["meta"]["image"]}; Generating rect with {default_action}')
             rect_data = default_img.get_bounding_rect()
+            print(f'[Warning] No slice for {config["meta"]["image"]}; Generating rect with {default_action}: {rect_data}')
 
 
 

@@ -9,6 +9,7 @@ uniform float caTimer = -1.0;
 uniform float t;
 uniform float killTimer = -1.0;
 uniform float comboShowTimer = -1.0;
+uniform vec2 offset;
 in vec2 uvs;
 out vec4 f_color;
 
@@ -75,19 +76,21 @@ void main() {
         float n2 = texture(noiseTex, uvsSPx - 0.001*vec2(t)).r;
         float n = clamp(n1+n2, 0, 1);
 
-        float c = smoothstep(0.8, 1.0, uvsPx.y);
-        float k = smoothstep(0.3, 1.0, uvsPx.y);
+        float c = smoothstep(0.5, 1.0, uvsPx.y-offset.y/screenSize[1]);
+        float k = smoothstep(0.3, 1.0, uvsPx.y-offset.y/screenSize[1]);
 
         float v = clamp(c+c*n, 0, 1);
 
-        f_color.rgb = mix(PURPLE_1, PURPLE_2, v);
+        // f_color.rgb = mix(PURPLE_1, PURPLE_2, v);
 
-        // if (v > 0.5) {
-        //     f_color.rgb = vec3(PURPLE_2);
-        // }
-        // else {
-        //     f_color.rgb = vec3(PURPLE_1);
-        // }
+        if (v > 0.1) {
+            f_color.rgb = vec3(PURPLE_2);
+            // f_color = mix(f_color, texture(canvasTex, vec2(uvs.x+offset.x, 1) + vec2(0 -uvs.y-offset)), 0.5);
+        }
+        else {
+            f_color.rgb = vec3(PURPLE_1);
+        }
+
     }
 
     if (uvsScreen.y > 40 && uvsScreen.y < 55) {

@@ -1,0 +1,22 @@
+{ "frames": [
+   {
+    "filename": "idle",
+    "frame": { "x": 0, "y": 0, "w": 110, "h": 138 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 118, "y": 62, "w": 110, "h": 138 },
+    "sourceSize": { "w": 228, "h": 200 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "fish_shop.png",
+  "format": "RGBA8888",
+  "size": { "w": 110, "h": 138 },
+  "scale": "1",
+  "slices": [
+  ]
+ }
+}

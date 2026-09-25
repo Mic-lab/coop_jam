@@ -10,6 +10,7 @@ from .particle import ParticleGenerator
 from .mgl import shader_handler
 from .combo_manager import ComboManager
 from .orb import Orb, HpBar
+from .shop import Shop
 
 class Level:
 
@@ -34,9 +35,12 @@ class Level:
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000
         '''
 
+        self.shop = Shop(self.game_map.game)
+        self.shop.show()
+
         self.particle_gens = []
         self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
-        self.player_2 = Player2(self.game_map.game, name='side', pos=(30, -30), action='idle')
+        self.player_2 = Player2(self.game_map.game, name='player_2', pos=(30, -30), action='idle')
         self.orb = Orb(self, (400, 74))
         self.hp_bar = HpBar((0, 20), 20)
         self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
@@ -112,6 +116,7 @@ class Level:
         ParticleGenerator.update_generators(self.particle_gens)
 
         self.combo_manager.update()
+        self.shop.update()
 
     def render(self, surf):
         rounded_offset = Vec2(int(self.offset[0]), int(self.offset[1]))
@@ -130,6 +135,10 @@ class Level:
         self.hp_bar.render(surf)
 
         self.combo_manager.render(surf, (0, 0))
+
+        self.shop.render(surf)
+
+        shader_handler.vars['offset'] = self.offset
 
 class GameMap:
 
