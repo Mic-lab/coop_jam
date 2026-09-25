@@ -144,10 +144,10 @@ class Player2(Player):
                 'move_right': self.game.inputs['held'].get('right'),
                 }
 
-        if actions.get('move_left'):
-            level.shop.hide()
-        elif actions.get('move_right'):
-            level.shop.show()
+        # if actions.get('move_left'):
+        #     level.shop.hide()
+        # elif actions.get('move_right'):
+        #     level.shop.show()
 
         if self.game.inputs['pressed'].get('/'):
             self.pull_request()

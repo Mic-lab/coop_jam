@@ -18,7 +18,7 @@ class Fish(PhysicsEntity):
     def __init__(self, game, *args, **kwargs):
         self.game = game
         self.angled = True
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, action='idle', **kwargs)
         self.dead = False
         self.collision_mode = 'soft_tracked'
         self.coord = self.pos - 0.5*Vec2(self.img.get_size())
@@ -149,6 +149,9 @@ class Fish(PhysicsEntity):
 
 class NormalFish(Fish):
 
+    def __init__(self, game, *args, **kwargs):
+        super().__init__(game, *args, name='ghost', **kwargs)
+
     def do_behavior(self):
 
         target = self.game.game_map.level.orb
@@ -167,7 +170,7 @@ class DashFish(Fish):
     ACCELERATION = 0.08
 
     def __init__(self, game, *args, **kwargs):
-        super().__init__(game, *args, **kwargs)
+        super().__init__(game, *args, name='dash_fish', **kwargs)
         self.t = 0
 
     def do_behavior(self):

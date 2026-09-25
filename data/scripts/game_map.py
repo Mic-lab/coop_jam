@@ -11,13 +11,16 @@ from .mgl import shader_handler
 from .combo_manager import ComboManager
 from .orb import Orb, HpBar
 from .shop import Shop
+from .wave_manager import WaveManager
 
 class Level:
 
     def __init__(self, game_map):
         self.game_map = game_map
+        game = self.game_map.game
         self.load()
         self.combo_manager = ComboManager()
+        self.wave_manager = WaveManager(game)
 
     def load(self):
 
@@ -44,9 +47,11 @@ class Level:
         self.orb = Orb(self, (400, 74))
         self.hp_bar = HpBar((0, 20), 20)
         self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
-        self.enemies = [
-                enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
-                ]
+
+        self.enemies = []
+        # self.enemies = [
+        #         enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
+        #         ]
 
         tiles = []
 
@@ -81,37 +86,34 @@ class Level:
         return -0.5*(Vec2(self.player_1.rect.center)+self.player_2.rect.center) + 0.5*config.GAME_SIZE
 
     def update(self):
-        entities = self.tiles + self.enemies
-        self.player_1.update(entities)
-        self.player_2.update(entities)
-        for tile in self.tiles:
-            tile.update()
-        self.orb.update()
-        self.hp_bar.update()
-        new_enemies = []
-        for enemy in self.enemies:
-            output = enemy.update([self.orb])
-            if output.get('remove'):
-                continue
-            new_enemies.append(enemy)
-        self.enemies = new_enemies
+        game = self.game_map.game
+
+        if game.inputs['pressed'].get('1'):
+            self.shop.show()
+        if game.inputs['pressed'].get('2'):
+            self.shop.hide()
+
+
+        if not self.shop.showing:
+            entities = self.tiles + self.enemies
+            self.player_1.update(entities)
+            self.player_2.update(entities)
+            for tile in self.tiles:
+                tile.update()
+            self.orb.update()
+            self.hp_bar.update()
+
+            self.wave_manager.update()
+            new_enemies = []
+            for enemy in self.enemies:
+                output = enemy.update([self.orb])
+                if output.get('remove'):
+                    continue
+                new_enemies.append(enemy)
+            self.enemies = new_enemies
 
         self.offset += 0.5*(self.desired_offset-self.offset)
 
-        # if self.game_map.t % 120 == 0:
-        if self.game_map.t % 30 == 0:
-            if random.randint(0, 1):
-                x = 100
-            else:
-                x = 700
-
-            if random.randint(0,1):
-                e = enemies.DashFish(self.game_map.game, pos=(x, 0), name='dash_fish', action='idle')
-            else:
-                e = enemies.NormalFish(self.game_map.game, pos=(x, 0), name='ghost', action='idle')
-            self.enemies.append(
-                    e
-                    )
 
         ParticleGenerator.update_generators(self.particle_gens)
 
