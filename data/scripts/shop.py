@@ -24,6 +24,7 @@ class Shop:
                 'button_3': Button(get_rect(2), 'Hello world', 'basic'),
                 'button_4': Button(get_rect(3), 'Hello world', 'basic'),
                         }
+        self.last_mouse_pos = None
 
         self.fish = Entity((0, 0), 'fish_shop', action='idle')
         self.fish.real_pos[1] = config.GAME_SIZE[1] - self.fish.rect.h
@@ -31,8 +32,14 @@ class Shop:
     def show(self):
         self.showing = True
 
+        self.selected_button = (0, 'button_1')
+        self.buttons['button_1'].select(select_sound=None)
+        self.last_mouse_pos = None
+
+
     def hide(self):
         self.showing = False
+        self.buttons[self.selected_button[1]].selected = False
 
     def update(self):
         if self.showing:
@@ -42,10 +49,43 @@ class Shop:
         else:
             self.hide_timer.update()
 
-        for key, button in self.buttons.items():
-            button.update(self.game.inputs, click_sound='buy.wav')
 
         self.fish.update()
+
+        if self.showing:
+            self.update_buttons()
+
+    def update_buttons(self):
+        ignore_mouse = True
+        if self.game.inputs['game_mouse_pos'] != self.last_mouse_pos or self.game.inputs['pressed'].get('mouse1'):
+            self.last_mouse_pos = self.game.inputs['game_mouse_pos']
+            ignore_mouse = False
+
+        new_selected_button = None
+        i = 0
+        for key, button in self.buttons.items():
+            button.update(self.game.inputs, click_sound='buy.wav', ignore_mouse=ignore_mouse)
+            if button.selected and key != self.selected_button[1]:
+                new_selected_button = i, key
+            i += 1
+
+        if ignore_mouse:
+            new_index = None
+            if self.game.inputs['pressed'].get('up') or self.game.inputs['pressed'].get('w'):
+                new_index = self.selected_button[0]-1
+            elif self.game.inputs['pressed'].get('down') or self.game.inputs['pressed'].get('s'):
+                new_index = self.selected_button[0]+1
+
+            if new_index is not None and (0 <= new_index < len(self.buttons)):
+                key = list(self.buttons)[new_index]
+                new_selected_button = new_index, key
+                self.buttons[key].select()
+
+        if new_selected_button:
+            if self.selected_button:
+                self.buttons[self.selected_button[1]].selected = False
+            self.selected_button = new_selected_button
+
 
     def render(self, surf):
         if self.hide_timer.done: return
@@ -93,7 +133,7 @@ class Button:
         self.released = False
         self.disabled = False
         self.generate_surf()
-        self.unselect_timer = Timer(10, done=True)
+        self.unselect_timer = Timer(8, done=True)
 
     def disable(self):
         self.disabled = True
@@ -128,19 +168,17 @@ class Button:
         s.blit(text_img, (16, 0.5*(s.get_height()-text_img.get_height())))
         self.surf = s
         
-    def update(self, inputs, select_sound='select.wav', click_sound='click.wav'):
+    def update(self, inputs, select_sound='select.wav', click_sound='click.wav', ignore_mouse=False):
         if self.disabled: return
 
         self.clicked = False
-        if self.rect.collidepoint(inputs.get('game_mouse_pos')):
-            if not self.selected:
-                sfx.sounds[select_sound].play()
-            self.selected = True
+        if self.rect.collidepoint(inputs.get('game_mouse_pos')) and not ignore_mouse:
+            self.select(select_sound)
             if inputs['pressed'].get('mouse1'):
                 self.clicked = True
                 sfx.sounds[click_sound].play()
-        else:
-            self.selected = False
+            # else:
+            #     self.selected = False
 
 
 
@@ -152,6 +190,12 @@ class Button:
             self.unselect_timer.update()
 
         # self.generate_surf()
+
+    def select(self, select_sound='select.wav'):
+        if not self.selected:
+            if select_sound: sfx.sounds[select_sound].play()
+        self.selected = True
+
                 
     def render(self, surf, offset):
         surf.blit(self.surf, self.rect.topleft + pygame.Vector2(offset))

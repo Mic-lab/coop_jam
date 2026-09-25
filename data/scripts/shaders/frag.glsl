@@ -119,7 +119,7 @@ void main() {
 
     }
 
-    // f_color *= 1-1.1*centerDist* mix(0.5, 1, random2d(uvs));
+    // f_color.g *= 1-1.1*centerDist* mix(0.5, 1, random2d(uvs));
     // f_color *= mix(0.5, 1, random2d(uvs));
 
 

@@ -27,6 +27,7 @@ def load_sounds():
             v = 1
         elif file.startswith('hit.wav'):
             v = 0.2
+            v = 0
         elif file.startswith('select.wav'):
             v = 1
         else:
