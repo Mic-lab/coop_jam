@@ -19,10 +19,10 @@ class Shop:
             return (0, 80+i*(h+10), 150, h)
 
         self.buttons = {
-                'button_1': Button(get_rect(0), 'Hello world', 'basic'),
-                'button_2': Button(get_rect(1), 'Hello world', 'basic'),
-                'button_3': Button(get_rect(2), 'Hello world', 'basic'),
-                'button_4': Button(get_rect(3), 'Hello world', 'basic'),
+                'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', click_sound='buy.wav'),
+                'button_2': Button(get_rect(1), 'P1: Hello world', 'basic', click_sound='buy.wav'),
+                'button_3': Button(get_rect(2), 'P2: Hello world', 'basic', click_sound='buy.wav'),
+                'done': Button(get_rect(3), 'Done', 'basic', bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
                         }
         self.last_mouse_pos = None
 
@@ -32,9 +32,11 @@ class Shop:
     def show(self):
         self.showing = True
 
-        self.selected_button = (0, 'button_1')
-        self.buttons['button_1'].select(select_sound=None)
+        k = next(iter(self.buttons.keys()))
+        self.selected_button = (0, k)
+        self.buttons[k].select(select_sound=None)
         self.last_mouse_pos = None
+        print(k)
 
 
     def hide(self):
@@ -64,7 +66,7 @@ class Shop:
         new_selected_button = None
         i = 0
         for key, button in self.buttons.items():
-            button.update(self.game.inputs, click_sound='buy.wav', ignore_mouse=ignore_mouse)
+            button.update(self.game.inputs, ignore_mouse=ignore_mouse)
             if button.selected and key != self.selected_button[1]:
                 new_selected_button = i, key
             i += 1
@@ -75,6 +77,7 @@ class Shop:
                 new_index = self.selected_button[0]-1
             elif self.game.inputs['pressed'].get('down') or self.game.inputs['pressed'].get('s'):
                 new_index = self.selected_button[0]+1
+                print('going down')
 
             if new_index is not None and (0 <= new_index < len(self.buttons)):
                 key = list(self.buttons)[new_index]
@@ -88,10 +91,20 @@ class Shop:
 
         btn = self.buttons[self.selected_button[1]]
         if self.game.inputs['pressed'].get('space'):
-            btn.click('buy.wav')
+            btn.click()
         if btn.clicked:
             btn.bg = Animation.img_db['button_disabled']
+            player_1 = self.game.game_map.level.player_1
+            player_2 = self.game.game_map.level.player_2
+            btn_name = self.selected_button[1]
+
+            if btn_name == 'done':
+                self.game.game_map.level.hide_shop()
+                return
+
             btn.disable()
+            if btn_name == 'double_jump':
+                player_1.max_jumps = 2
 
 
     def render(self, surf):
@@ -115,13 +128,14 @@ class Shop:
 
         i = 0
         for key, button in self.buttons.items():
-            btn_x = easing.lerp(config.GAME_SIZE[0], config.GAME_SIZE[0]-110-i*8, easing.ease_out_back(t2))
+            btn_x = easing.lerp(config.GAME_SIZE[0], config.GAME_SIZE[0]-140-i*4, easing.ease_out_back(t2))
             button.rect.x = btn_x
-            offset_x = easing.lerp(0, -60, easing.ease_out_back(1-button.unselect_timer.ratio))
+            offset_x = easing.lerp(0, -70, easing.ease_out_back(1-button.unselect_timer.ratio))
             button.render(surf, offset=(offset_x, 0))
             i += 1
 
-        surf.blit(Animation.img_db['shop_title'], (455, 10))
+        title_x = easing.lerp(config.GAME_SIZE[0], 455, easing.ease_out_back(t1))
+        surf.blit(Animation.img_db['shop_title'], (title_x, 10))
 
 class Button:
     
@@ -138,7 +152,7 @@ class Button:
         },
     }
     
-    def __init__(self, rect: pygame.Rect, text, preset):
+    def __init__(self, rect: pygame.Rect, text, preset, bg=None, click_sound=None):
         self.rect = pygame.Rect(rect)
         self.text = text
         self.preset = preset
@@ -146,9 +160,11 @@ class Button:
         self.clicked = False
         self.released = False
         self.disabled = False
-        self.bg = Animation.img_db['button']
+        if bg is None: bg = Animation.img_db['button']
+        self.bg = bg
         self.generate_surf()
         self.unselect_timer = Timer(8, done=True)
+        self.click_sound = click_sound
 
     def disable(self):
         self.disabled = True
@@ -183,6 +199,8 @@ class Button:
         self.surf = s
         
     def update(self, inputs, select_sound='select.wav', click_sound='click.wav', ignore_mouse=False):
+        click_sound = self.click_sound
+
         self.clicked = False
         if self.rect.collidepoint(inputs.get('game_mouse_pos')) and not ignore_mouse:
             self.select(select_sound)

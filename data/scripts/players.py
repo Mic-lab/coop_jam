@@ -22,6 +22,9 @@ class Player(PhysicsEntity):
         self.jump_timer = Timer(12, done=True)  # Jump buffer
         self.grounded_timer = Timer(6, done=True)  # Coyote time
 
+        self.max_jumps = 1
+        self.jumps = 0
+
     @property
     def jump_rising(self):
         return self.jumping and self.vel[1] < 0
@@ -62,6 +65,7 @@ class Player(PhysicsEntity):
 
         # NOTE: idk if this activates at every frame cause gravity's intensity is subpixel
         if self.collision_directions['down']:
+            self.jumps = self.max_jumps
             self.grounded = True
             if not started_jump:
                 # self.vel[1] = 0
