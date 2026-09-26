@@ -90,7 +90,7 @@ class Shop:
             self.selected_button = new_selected_button
 
         btn = self.buttons[self.selected_button[1]]
-        if self.game.inputs['pressed'].get('space'):
+        if self.game.inputs['pressed'].get('space') or self.game.inputs['pressed'].get('/'):
             btn.click()
         if btn.clicked:
             btn.bg = Animation.img_db['button_disabled']

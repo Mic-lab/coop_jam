@@ -134,8 +134,8 @@ void main() {
             tTimer = 1.0 - transitionTimer;
         }
         f_color.r *= clamp(tTimer, 0, 1);
-        f_color.g *= clamp(1.5*tTimer, 0, 1);
-        f_color.b *= clamp(2*tTimer, 0, 1);
+        f_color.g *= clamp(1.2*tTimer, 0, 1);
+        f_color.b *= clamp(1.5*tTimer, 0, 1);
         // f_color *= tTimer;
         // f_color.rb *= tTimer;
 

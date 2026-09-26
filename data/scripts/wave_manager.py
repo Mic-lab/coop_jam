@@ -19,7 +19,7 @@ class Wave:
         self.t += 1
 
     def spawn_enemy(self, Enemy: enemies.Fish, directions=(0, 1)):
-        vel = pygame.Vector2(random.randint(0, 10))
+        vel = pygame.Vector2(random.randint(10, 30), 0)
         vel.rotate_ip(random.randint(-30, 30))
 
         if random.choice(directions):
@@ -65,7 +65,7 @@ class WaveManager:
                 Wave1(game),
                 Wave1(game),
                 )
-        self.wave_end_timer = Timer(60, done=True)
+        self.wave_end_timer = Timer(120, done=True)
 
     @property
     def wave(self):
@@ -79,6 +79,7 @@ class WaveManager:
         if wave_complete:
             if not self.old_wave_complete:
                 self.wave_end_timer.reset()
+                pygame.mixer_music.fadeout(2000)
         self.old_wave_complete = wave_complete
 
         timer_done_old = self.wave_end_timer.done

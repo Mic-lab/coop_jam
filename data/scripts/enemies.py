@@ -168,7 +168,7 @@ class NormalFish(Fish):
 
 class BigFish(NormalFish):
 
-    def __init__(self, game, *args, name='big_fish', speed_change=0.03, speed=1, **kwargs):
+    def __init__(self, game, *args, name='big_fish', speed_change=0.02, speed=1, **kwargs):
         super().__init__(game, *args, name=name, speed_change=speed_change, speed=speed, **kwargs)
 
 

@@ -53,7 +53,7 @@ class Level:
                                         
 
 
-p       00000000000000                      00000000000                p
+p                                                                      p
 p                                                                      p
 p                                                                      p
 p                                                                      p
@@ -147,8 +147,8 @@ p                                                                      p
         self.shop.update()
 
     def restart(self):
-        pass
-        # self.load()
+        pygame.mixer_music.fadeout(1000)
+        self.game.handler.transition_to(self.game.handler.states.Game)
 
     def render(self, surf):
         rounded_offset = Vec2(int(self.offset[0]), int(self.offset[1]))

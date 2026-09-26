@@ -54,13 +54,6 @@ class Player(PhysicsEntity):
                 sfx.sounds['jump.wav'].play()
 
         if actions['jump_pressed'] and not started_jump:
-            print(f'''
-                  {self.grounded=}
-                  {self.can_double_jump=}
-                  {self.did_double_jump=}
-                  {started_jump=}
-                  ---
-                  ''')
             if not self.grounded and self.can_double_jump and not self.did_double_jump:
                 self.show_wings = True
                 self.wings.animation.set_action('idle', reset=True)
@@ -177,7 +170,7 @@ class Player2(Player):
     PULL_SPEED = 5
     PULL_SPEED = 12
     
-    PULL_ACCELERATION = 0.16
+    PULL_ACCELERATION = 0.14
     BUBBLE_GRAVITY = 0.1
     BUBBLE_CONTROL = 0.09  # shouldnt be more than gravity, otherwise u can fly up
 
