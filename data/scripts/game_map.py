@@ -4,7 +4,7 @@ from pygame import Vector2 as Vec2
 
 from data.scripts import enemies
 from .entity import Entity
-from . import config
+from . import config, sfx
 from .players import Player1, Player2
 from .particle import ParticleGenerator
 from .mgl import shader_handler
@@ -12,18 +12,40 @@ from .combo_manager import ComboManager
 from .orb import Orb, HpBar
 from .shop import Shop
 from .wave_manager import WaveManager
+from .animation import Animation
 
 class Level:
 
     def __init__(self, game_map):
         self.game_map = game_map
-        game = self.game_map.game
+        self.game = self.game_map.game
         self.load()
-        self.combo_manager = ComboManager()
-        self.wave_manager = WaveManager(game)
 
     def load(self):
 
+        self.load_tiles()
+
+        self.tutorial = True
+        pygame.mixer_music.set_volume(0.5)
+        sfx.play_music('tutorial.wav')
+
+        self.combo_manager = ComboManager()
+        self.wave_manager = WaveManager(self.game)
+
+        self.shop = Shop(self.game_map.game)
+
+        self.particle_gens = []
+        x = ((self.size[0]+0.5)*config.TILE_SIZE[0])*0.5
+        self.player_1 = Player1(self.game_map.game, name='side', pos=(x, -30), action='idle')
+        self.player_2 = Player2(self.game_map.game, name='player_2', pos=(x, -30), action='idle')
+        self.orb = Orb(self, (400, 74))
+        self.hp_bar = HpBar((0, 20), 20)
+        self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
+        self.enemies = []
+        self.offset = self.desired_offset
+
+
+    def load_tiles(self):
         level_content = '''
 
 
@@ -37,26 +59,8 @@ class Level:
      
 000000000000000000000000000000000000000000000000000000000000000000000000000000000000
         '''
-
-        self.shop = Shop(self.game_map.game)
-        self.shop.show()
-
-        self.particle_gens = []
-        self.player_1 = Player1(self.game_map.game, name='side', pos=(0, -30), action='idle')
-        self.player_2 = Player2(self.game_map.game, name='player_2', pos=(30, -30), action='idle')
-        self.orb = Orb(self, (400, 74))
-        self.hp_bar = HpBar((0, 20), 20)
-        self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
-
-        self.enemies = []
-        # self.enemies = [
-        #         enemies.NormalFish(self.game_map.game, pos=(100, 0), name='ghost', action='idle')
-        #         ]
-
         tiles = []
-
         max_x = -1
-
         y = 0
         for line in level_content.splitlines():
             # if not line: continue
@@ -72,12 +76,8 @@ class Level:
                     raise KeyError
                 x += 1
             y += 1
-
         self.tiles = tiles
         self.size = (max_x, y)
-
-
-        self.offset = self.desired_offset
 
     @property
     def desired_offset(self):
@@ -85,13 +85,29 @@ class Level:
         # return -Vec2(self.player_1.rect.center) + 0.5*config.GAME_SIZE
         return -0.5*(Vec2(self.player_1.rect.center)+self.player_2.rect.center) + 0.5*config.GAME_SIZE
 
+    def show_shop(self):
+        self.shop.show()
+        pygame.mixer_music.set_volume(1)
+        sfx.play_music('shop.wav')
+    
+    def hide_shop(self):
+        self.shop.hide()
+        pygame.mixer_music.set_volume(0.7)
+        sfx.play_music('song.wav')
+
+
     def update(self):
         game = self.game_map.game
 
+        if game.inputs['pressed'].get('space') and self.tutorial:
+            self.tutorial = False
+            pygame.mixer_music.set_volume(0.7)
+            sfx.play_music('song.wav')
+
         if game.inputs['pressed'].get('1'):
-            self.shop.show()
+            self.show_shop()
         if game.inputs['pressed'].get('2'):
-            self.shop.hide()
+            self.hide_shop()
 
 
         if not self.shop.showing:
@@ -103,7 +119,9 @@ class Level:
             self.orb.update()
             self.hp_bar.update()
 
-            self.wave_manager.update()
+            if not self.tutorial:
+                self.wave_manager.update()
+
             new_enemies = []
             for enemy in self.enemies:
                 output = enemy.update([self.orb])
@@ -112,6 +130,9 @@ class Level:
                 new_enemies.append(enemy)
             self.enemies = new_enemies
 
+        if self.hp_bar.val <= 0:
+            self.restart()
+
         self.offset += 0.5*(self.desired_offset-self.offset)
 
 
@@ -119,6 +140,9 @@ class Level:
 
         self.combo_manager.update()
         self.shop.update()
+
+    def restart(self):
+        self.load()
 
     def render(self, surf):
         rounded_offset = Vec2(int(self.offset[0]), int(self.offset[1]))
@@ -139,6 +163,13 @@ class Level:
         self.combo_manager.render(surf, (0, 0))
 
         self.shop.render(surf)
+
+        if self.tutorial:
+            img = Animation.img_db['tutorial']
+            surf.blit(
+                    Animation.img_db['tutorial'],
+                    0.5*Vec2(config.GAME_SIZE) + rounded_offset + (0, -400)
+                    )
 
         shader_handler.vars['offset'] = self.offset
 

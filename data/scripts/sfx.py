@@ -6,12 +6,12 @@ pygame.mixer.init()
 SOUNDS_DIR = os.path.join('data/sfx/sounds')
 MUSIC_DIR = os.path.join('data/sfx/music')
 
-def play_music(file_name, *args, **kwargs):
+def play_music(file_name, *args, loops=-1, **kwargs):
     # Program freezes when there's music.fadeout
     # So for the music to forcefully play, the fadout must be stopped. 
     pygame.mixer.music.stop()
     pygame.mixer.music.load(os.path.join(MUSIC_DIR, file_name))
-    pygame.mixer.music.play(*args, **kwargs)
+    pygame.mixer.music.play(*args, loops=loops, **kwargs)
 
 def load_sounds():
     print('Loading sounds...')
