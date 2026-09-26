@@ -122,8 +122,11 @@ class Player1(Player):
 class Player2(Player):
 
     PULL_SPEED = 5
-    PULL_SPEED = 8
-    PULL_ACCELERATION = 0.2
+    PULL_SPEED = 12
+    
+    PULL_ACCELERATION = 0.16
+    BUBBLE_GRAVITY = 0.1
+    BUBBLE_CONTROL = 0.09  # shouldnt be more than gravity, otherwise u can fly up
 
     def __init__(self, game, *args, **kwargs):
         super().__init__(game, *args, **kwargs)
@@ -173,6 +176,7 @@ class Player2(Player):
             
             # if self.vel.length() > self.PULL_SPEED:
             #     scale_to_length(self.vel, self.PULL_SPEED)
+            self.vel[1] += self.BUBBLE_GRAVITY
             self.vel *= 0.97
 
 
@@ -193,7 +197,7 @@ class Player2(Player):
             if self.game.inputs['held'].get('left'):
                 vel_change[0] -= 1
 
-            scale_to_length(vel_change, 0.16)
+            scale_to_length(vel_change, self.BUBBLE_CONTROL)
             self.vel += vel_change
 
             PhysicsEntity.update(self, rects)
@@ -229,7 +233,7 @@ class Player2(Player):
             self.bubble.render(surf, offset)
 
     def on_collision(self, entity):
-        if hasattr(entity, 'tag') and entity.tag == 'enemy':
+        if entity.tag == 'enemy':
             if self.being_pulled:
                 self.game.game_map.level.combo_manager.add_kills(1)
                 sfx.sounds[f'kill_{random.randint(1, 4)}.wav'].play()

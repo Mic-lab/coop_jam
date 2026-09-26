@@ -16,7 +16,7 @@ class Shop:
         h = Animation.img_db['button'].get_height()
 
         def get_rect(i):
-            return (0, 50+i*(h+10), 150, h)
+            return (0, 80+i*(h+10), 150, h)
 
         self.buttons = {
                 'button_1': Button(get_rect(0), 'Hello world', 'basic'),
@@ -86,6 +86,13 @@ class Shop:
                 self.buttons[self.selected_button[1]].selected = False
             self.selected_button = new_selected_button
 
+        btn = self.buttons[self.selected_button[1]]
+        if self.game.inputs['pressed'].get('space'):
+            btn.click('buy.wav')
+        if btn.clicked:
+            btn.bg = Animation.img_db['button_disabled']
+            btn.disable()
+
 
     def render(self, surf):
         if self.hide_timer.done: return
@@ -110,14 +117,21 @@ class Shop:
         for key, button in self.buttons.items():
             btn_x = easing.lerp(config.GAME_SIZE[0], config.GAME_SIZE[0]-110-i*8, easing.ease_out_back(t2))
             button.rect.x = btn_x
-            offset_x = easing.lerp(0, -40, easing.ease_out_back(1-button.unselect_timer.ratio))
+            offset_x = easing.lerp(0, -60, easing.ease_out_back(1-button.unselect_timer.ratio))
             button.render(surf, offset=(offset_x, 0))
             i += 1
+
+        surf.blit(Animation.img_db['shop_title'], (455, 10))
 
 class Button:
     
     presets = {
         'basic': {
+            'colors': {'border': [91, 77, 76], 
+                       'fill': [151, 134, 125], 
+                       'text': [240, 240, 240] }
+        },
+        'disabled': {
             'colors': {'border': [91, 77, 76], 
                        'fill': [151, 134, 125], 
                        'text': [240, 240, 240] }
@@ -132,6 +146,7 @@ class Button:
         self.clicked = False
         self.released = False
         self.disabled = False
+        self.bg = Animation.img_db['button']
         self.generate_surf()
         self.unselect_timer = Timer(8, done=True)
 
@@ -159,9 +174,8 @@ class Button:
         # self.surf.blit(text_img, (rect.centerx - text_img.get_width()*0.5,
         #                      rect.centery - text_img.get_height()*0.5 - 1))
 
-        bg =  Animation.img_db['button']
-        s = pygame.Surface(bg.get_size())
-        s.blit(bg)
+        s = pygame.Surface(self.bg.get_size())
+        s.blit(self.bg)
         s.set_colorkey((0,0,0))
 
         text_img = fonts[self.presets[self.preset].get('font', 'shop')].get_surf(self.text, color=self.colors['text'])
@@ -169,14 +183,11 @@ class Button:
         self.surf = s
         
     def update(self, inputs, select_sound='select.wav', click_sound='click.wav', ignore_mouse=False):
-        if self.disabled: return
-
         self.clicked = False
         if self.rect.collidepoint(inputs.get('game_mouse_pos')) and not ignore_mouse:
             self.select(select_sound)
             if inputs['pressed'].get('mouse1'):
-                self.clicked = True
-                sfx.sounds[click_sound].play()
+                self.click(click_sound)
             # else:
             #     self.selected = False
 
@@ -190,6 +201,11 @@ class Button:
             self.unselect_timer.update()
 
         # self.generate_surf()
+
+    def click(self, click_sound):
+        if self.disabled: return
+        self.clicked = True
+        sfx.sounds[click_sound].play()
 
     def select(self, select_sound='select.wav'):
         if not self.selected:

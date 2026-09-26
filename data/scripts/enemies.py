@@ -167,7 +167,7 @@ class NormalFish(Fish):
 
 class DashFish(Fish):
 
-    ACCELERATION = 0.08
+    ACCELERATION = 0.25
 
     def __init__(self, game, *args, **kwargs):
         super().__init__(game, *args, name='dash_fish', **kwargs)
@@ -181,6 +181,6 @@ class DashFish(Fish):
         if accel.length() > self.ACCELERATION:
             accel.scale_to_length(self.ACCELERATION * (1+(math.sin((2/60)*self.t))))
         self.vel += accel
-        self.vel *= 0.98
+        self.vel *= 0.9
 
-        self.t += random.randint(1, 3)
+        self.t += random.randint(3, 5)

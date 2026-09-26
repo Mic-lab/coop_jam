@@ -93,7 +93,6 @@ class Button:
                              rect.centery - text_img.get_height()*0.5 - 1))
         
     def update(self, inputs, select_sound='select.wav', click_sound='click.wav'):
-        if self.disabled: return
         old_state = self.state
 
         self.clicked = False

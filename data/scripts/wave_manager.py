@@ -1,4 +1,5 @@
 import random
+import pygame
 from . import enemies
 from abc import abstractmethod
 
@@ -15,9 +16,17 @@ class Wave:
         self.t += 1
 
     def spawn_enemy(self, Enemy: enemies.Fish):
-        x = 100
+
+        vel = pygame.Vector2(random.randint(0, 10))
+        vel.rotate_ip(random.randint(-30, 30))
+
+        if random.choice((0, 1)):
+            x = 100
+        else:
+            x = 900
+            vel.x *= -1
         y = 100
-        enemy = Enemy(self.game, pos=(x, y))
+        enemy = Enemy(self.game, pos=(x, y), vel=vel)
         self.game.game_map.level.enemies.append(enemy)
 
     @abstractmethod

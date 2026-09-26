@@ -53,11 +53,11 @@ class Level:
                                         
 
 
-        00000000000000                      00000000000
-
-     
-     
-000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+p       00000000000000                      00000000000                p
+p                                                                      p
+p                                                                      p
+p                                                                      p
+000000000000000000000000000000000000000000000000000000000000000000000000
         '''
         tiles = []
         max_x = -1
@@ -73,7 +73,8 @@ class Level:
                 elif c == ' ':
                     pass
                 else:
-                    raise KeyError
+                    pass
+                    # raise KeyError
                 x += 1
             y += 1
         self.tiles = tiles
@@ -142,7 +143,8 @@ class Level:
         self.shop.update()
 
     def restart(self):
-        self.load()
+        pass
+        # self.load()
 
     def render(self, surf):
         rounded_offset = Vec2(int(self.offset[0]), int(self.offset[1]))
