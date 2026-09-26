@@ -26,6 +26,7 @@ class Player(PhysicsEntity):
         self.jump_descent = True
         self.jump_timer = Timer(12, done=True)  # Jump buffer
         self.grounded_timer = Timer(6, done=True)  # Coyote time
+        self.jump_force = 6
         
         self.wings = None
         self.show_wings = False
@@ -128,7 +129,7 @@ class Player(PhysicsEntity):
     def start_jump(self):
         self.jump_descent = False
         self.vel[1] = -4
-        self.vel[1] = -6
+        self.vel[1] = -self.jump_force
         self.jumping = True
 
         self.jump_timer.reset(done=True)

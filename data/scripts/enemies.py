@@ -149,8 +149,10 @@ class Fish(PhysicsEntity):
 
 class NormalFish(Fish):
 
-    def __init__(self, game, *args, **kwargs):
-        super().__init__(game, *args, name='ghost', **kwargs)
+    def __init__(self, game, *args, name='ghost', speed_change=0.1, speed=2, **kwargs):
+        super().__init__(game, *args, name=name, **kwargs)
+        self.speed_change = speed_change
+        self.speed = speed
 
     def do_behavior(self):
 
@@ -158,11 +160,16 @@ class NormalFish(Fish):
         accel = (self.coord - target.rect.center)
         accel = (target.rect.center - self.pos)
 
-        if accel.length() > self.ACCELERATION:
-            accel.scale_to_length(self.ACCELERATION)
+        if accel.length() > self.speed_change:
+            accel.scale_to_length(self.speed_change)
         self.vel += accel
-        if self.vel.length() > self.SPEED:
-            self.vel.scale_to_length(self.SPEED)
+        if self.vel.length() > self.speed:
+            self.vel.scale_to_length(self.speed)
+
+class BigFish(NormalFish):
+
+    def __init__(self, game, *args, name='big_fish', speed_change=0.03, speed=1, **kwargs):
+        super().__init__(game, *args, name=name, speed_change=speed_change, speed=speed, **kwargs)
 
 
 class DashFish(Fish):

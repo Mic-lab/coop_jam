@@ -20,7 +20,7 @@ class Shop:
 
         self.buttons = {
                 'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', click_sound='buy.wav'),
-                'button_2': Button(get_rect(1), 'P1: Hello world', 'basic', click_sound='buy.wav'),
+                'high_jump': Button(get_rect(1), 'P1: High jump', 'basic', click_sound='buy.wav'),
                 'button_3': Button(get_rect(2), 'P2: Hello world', 'basic', click_sound='buy.wav'),
                 'done': Button(get_rect(3), 'Done', 'basic', bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
                         }
@@ -105,6 +105,8 @@ class Shop:
             btn.disable()
             if btn_name == 'double_jump':
                 player_1.enable_double_jump()
+            elif btn_name == 'high_jump':
+                player_1.jump_force = 8
 
 
     def render(self, surf):

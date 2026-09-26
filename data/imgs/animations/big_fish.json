@@ -1,0 +1,22 @@
+{ "frames": [
+   {
+    "filename": "idle",
+    "frame": { "x": 0, "y": 0, "w": 58, "h": 53 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 58, "h": 53 },
+    "sourceSize": { "w": 58, "h": 53 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "big_fish.png",
+  "format": "RGBA8888",
+  "size": { "w": 58, "h": 53 },
+  "scale": "1",
+  "slices": [
+  ]
+ }
+}

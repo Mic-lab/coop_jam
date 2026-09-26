@@ -70,6 +70,9 @@ p                                                                      p
                 if c == '0':
                     tile = Tile(pos, 'ground', action='idle')
                     tiles.append(tile)
+                if c == 'p':
+                    tile = Tile(pos, 'portal', action='idle')
+                    tiles.append(tile)
                 elif c == ' ':
                     pass
                 else:
@@ -95,6 +98,7 @@ p                                                                      p
         self.shop.hide()
         pygame.mixer_music.set_volume(0.7)
         sfx.play_music('song.wav')
+        self.wave_manager.start_next_wave()
 
 
     def update(self):
