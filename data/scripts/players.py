@@ -3,6 +3,7 @@ from .entity import PhysicsEntity, Entity
 from .timer import Timer
 import random
 from . import sfx
+from .particle import ParticleGenerator
 
 def scale_to_length(vector, length):
     if not vector: return vector
@@ -12,18 +13,29 @@ class Player(PhysicsEntity):
     
     BOUNCE = 0.9
     GRAVITY_UP = 0.15
-    GRAVITY_DOWN = 0.3
+    GRAVITY_DOWN = 0.9
+
+    GRAVITY_UP = 0.2
+    GRAVITY_DOWN = 0.5
 
     def __init__(self, game, *args, **kwargs):
         self.game = game
         super().__init__(*args, **kwargs)
         self.grounded = False
         self.jumping = False
+        self.jump_descent = True
         self.jump_timer = Timer(12, done=True)  # Jump buffer
         self.grounded_timer = Timer(6, done=True)  # Coyote time
+        
+        self.wings = None
+        self.show_wings = False
+        self.did_double_jump = False
+        self.enable_double_jump()
 
-        self.max_jumps = 1
-        self.jumps = 0
+    def enable_double_jump(self):
+        self.can_double_jump = True
+        self.wings = Entity((0, 0), 'wings', action='idle')
+
 
     @property
     def jump_rising(self):
@@ -37,12 +49,27 @@ class Player(PhysicsEntity):
         if not self.jump_timer.done:
             if (self.grounded or not self.grounded_timer.done) and not self.jumping: 
                 self.start_jump()
-                self.jump_timer.reset(done=True)
-                self.grounded_timer.reset(done=True)
                 started_jump = True
+                sfx.sounds['jump.wav'].play()
 
-        elif actions['jump_released']:
+        if actions['jump_pressed'] and not started_jump:
+            print(f'''
+                  {self.grounded=}
+                  {self.can_double_jump=}
+                  {self.did_double_jump=}
+                  {started_jump=}
+                  ---
+                  ''')
+            if not self.grounded and self.can_double_jump and not self.did_double_jump:
+                self.show_wings = True
+                self.wings.animation.set_action('idle', reset=True)
+                self.did_double_jump = True
+                self.start_jump()
+                sfx.sounds['double_jump.wav'].play()
+
+        if actions['jump_released']:
             self.jump_release()
+
 
         if actions['move_left']:
             self.vel[0] -= 0.5
@@ -52,7 +79,8 @@ class Player(PhysicsEntity):
         self.vel[0] *= 0.9
         self.vel[0] = max(-3, min(3, self.vel[0]))
 
-        if self.vel[1] > 0: self.jump_descent = True
+        if self.vel[1] > 0:
+            self.jump_descent = True
         if self.jumping and not self.jump_descent:
             self.vel[1] += self.GRAVITY_UP
         else:
@@ -65,8 +93,8 @@ class Player(PhysicsEntity):
 
         # NOTE: idk if this activates at every frame cause gravity's intensity is subpixel
         if self.collision_directions['down']:
-            self.jumps = self.max_jumps
             self.grounded = True
+            self.did_double_jump = False
             if not started_jump:
                 # self.vel[1] = 0
                 self.jumping = False
@@ -81,6 +109,17 @@ class Player(PhysicsEntity):
         # if self.collision_directions['left'] or self.collision_directions['right']:
         #     self.vel[0] = 0
 
+        if self.show_wings:
+            self.wings.animation.flip[0] = self.animation.flip[0]
+            self.wings.real_pos = self.rect.topleft - Vec2(self.wings.animation.rect.topleft)
+            if self.wings.update():
+                self.show_wings = False
+
+    def render(self, surf, offset=(0, 0)):
+        if self.show_wings:
+            self.wings.render(surf, offset)
+        super().render(surf, offset)
+
     def jump_release(self):
         if self.jumping and self.vel[1] < 0:
             self.vel[1] *= 0.5
@@ -89,9 +128,18 @@ class Player(PhysicsEntity):
     def start_jump(self):
         self.jump_descent = False
         self.vel[1] = -4
-        self.vel[1] = -5
+        self.vel[1] = -6
         self.jumping = True
 
+        self.jump_timer.reset(done=True)
+        self.grounded_timer.reset(done=True)
+
+        self.game.game_map.level.particle_gens.append(
+                ParticleGenerator.from_template(
+                    self.rect.midbottom,
+                    'smoke',
+                    )
+                )
 
 class Player1(Player):
 

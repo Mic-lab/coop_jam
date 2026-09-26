@@ -104,7 +104,7 @@ class Shop:
 
             btn.disable()
             if btn_name == 'double_jump':
-                player_1.max_jumps = 2
+                player_1.enable_double_jump()
 
 
     def render(self, surf):
@@ -205,7 +205,7 @@ class Button:
         if self.rect.collidepoint(inputs.get('game_mouse_pos')) and not ignore_mouse:
             self.select(select_sound)
             if inputs['pressed'].get('mouse1'):
-                self.click(click_sound)
+                self.click()
             # else:
             #     self.selected = False
 
@@ -220,10 +220,10 @@ class Button:
 
         # self.generate_surf()
 
-    def click(self, click_sound):
+    def click(self):
         if self.disabled: return
         self.clicked = True
-        sfx.sounds[click_sound].play()
+        sfx.sounds[self.click_sound].play()
 
     def select(self, select_sound='select.wav'):
         if not self.selected:

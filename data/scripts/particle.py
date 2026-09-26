@@ -55,9 +55,11 @@ class ParticleGenerator:
 
     TEMPLATES = {
         'smoke': {
-            'base_particle': lambda: Particle(action='basic', vel=(0, 0)),
+            'base_particle': lambda: Particle(action='basic', vel=(0, 0), color=(colors.GRAY_1), acceleration=(0, 0.02)),
             'vel_randomness': 0.5,
-            'rate': 10
+            'velx_randomness': 2,
+            'rate': 1,
+            'duration': 6,
         },
         'angle test': {
             'base_particle': lambda: Particle(action='arrow', vel=(0, -2), acceleration=(0, 0.05), angled=True, color=(50, 100, 240)),
@@ -93,10 +95,11 @@ class ParticleGenerator:
         config = config | overwrites  
         return cls(pos=pos, **config)
 
-    def __init__(self, base_particle: Particle, pos, vel_randomness=1, duration=1, rate=1, inverse_rate=False):
+    def __init__(self, base_particle: Particle, pos, vel_randomness=1, velx_randomness=0, duration=1, rate=1, inverse_rate=False):
         self.base_particle = base_particle
         self.pos = pos
         self.vel_randomness = vel_randomness
+        self.velx_randomness = velx_randomness
         self.duration = duration
         self.rate = rate
         self.inverse_rate = inverse_rate
@@ -108,6 +111,7 @@ class ParticleGenerator:
         particle = self.base_particle()
         vel_offset = random.uniform(0, self.vel_randomness) * Vector2(1, 0)
         vel_offset = vel_offset.rotate(random.uniform(0, 360))
+        vel_offset.x += random.uniform(-self.velx_randomness*0.5, self.velx_randomness*0.5)
         particle.vel += vel_offset
         particle.real_pos = self.pos - 0.5 * Vector2(particle.img.get_size())
         return particle

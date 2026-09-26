@@ -160,7 +160,8 @@ p                                                                      p
         for gen in self.particle_gens:
             gen.render(surf, offset=rounded_offset)
 
-        self.hp_bar.render(surf)
+        if not self.tutorial:
+            self.hp_bar.render(surf)
 
         self.combo_manager.render(surf, (0, 0))
 

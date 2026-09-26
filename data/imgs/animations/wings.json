@@ -1,0 +1,50 @@
+{ "frames": [
+   {
+    "filename": "idle",
+    "frame": { "x": 0, "y": 0, "w": 32, "h": 24 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 8, "w": 32, "h": 24 },
+    "sourceSize": { "w": 35, "h": 36 },
+    "duration": 50
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 32, "y": 0, "w": 32, "h": 24 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 8, "w": 32, "h": 24 },
+    "sourceSize": { "w": 35, "h": 36 },
+    "duration": 50
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 64, "y": 0, "w": 32, "h": 24 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 8, "w": 32, "h": 24 },
+    "sourceSize": { "w": 35, "h": 36 },
+    "duration": 50
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 96, "y": 0, "w": 32, "h": 24 },
+    "rotated": false,
+    "trimmed": true,
+    "spriteSourceSize": { "x": 1, "y": 8, "w": 32, "h": 24 },
+    "sourceSize": { "w": 35, "h": 36 },
+    "duration": 50
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "wings.png",
+  "format": "RGBA8888",
+  "size": { "w": 128, "h": 24 },
+  "scale": "1",
+  "slices": [
+   { "name": "rect", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 11, "y": 11, "w": 13, "h": 20 } }] }
+  ]
+ }
+}

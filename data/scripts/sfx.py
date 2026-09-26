@@ -30,6 +30,8 @@ def load_sounds():
             v = 0
         elif file.startswith('select.wav'):
             v = 1
+        elif file.startswith('double_jump'):
+            v = 1
         else:
             v = 0.6
 
