@@ -4,7 +4,7 @@ from pygame import Vector2
 from .animation import Animation
     
 class Entity:
-    def __init__(self, pos, name, action=None, collision_mode='hard'):
+    def __init__(self, pos, name, action=None, collision_mode='hard', soft_directions=None):
         self.real_pos = Vector2(pos)
         self.name = name
         self.animation = Animation(name, action)
@@ -12,7 +12,10 @@ class Entity:
         self.is_solid = True
         self.stop_on_collision = True
         self.collision_mode = collision_mode
+        self.soft_directions = soft_directions
         self.tag = None
+        self.force_pass = False
+        self.old_rect = self.rect
 
     @property
     def pos(self):
@@ -37,7 +40,9 @@ class Entity:
         return self.animation.img
 
     def update(self):
-        return self.animation.update()
+        output = self.animation.update()
+        self.old_rect = self.rect
+        return output
 
     def render(self, surf, offset=(0,0)):
         # pygame.draw.rect(surf, (255, 0, 0), self.rect)
@@ -104,6 +109,7 @@ class PhysicsEntity(Entity):
             self.resolve_collisions(axis, rects)
 
         for tile in self.collided_tiles:
+            # print(f'Checking collision {self=} {tile=}')
             tile.on_collision(self)
             self.on_collision(tile)
 
@@ -132,7 +138,6 @@ class PhysicsEntity(Entity):
                     else:
                         delta = 0
                         if tile.collision_mode == 'hard': print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
-                    if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
                 elif axis == 1:
                     if self.vel[1] < 0:
                         delta = self.rect.top - rect.bottom
@@ -143,21 +148,43 @@ class PhysicsEntity(Entity):
                     else:
                         delta = 0
                         if  tile.collision_mode=='hard': print(f'[WARNING] {self} Didn\'t resolve collision last frame or rect changed sizes ({axis=})')
-                    if self.stop_on_collision and tile.collision_mode=='hard': self.vel[axis] = 0
 
-                if tile.collision_mode == 'hard':
-                    v = Vector2(0, 0)
-                    v[axis] = delta
-                    if tile.is_solid:
-                        self.change_pos(-v)
+                if self.force_pass:
+                    blocked = False
+                else:
+                    if not tile.soft_directions:
+                        blocked = True
+                    else:
+                        if (direction not in tile.soft_directions):
+                            # Hard coded for platform (probably a lot of the code is idk)
+                            blocked = self.old_rect.bottom <= tile.rect.top
+                        else:
+                            if self.name == 'side':
+                                pass
+                                # print(f'{self.force_pass=}')
+                            blocked = False
 
-                    if direction:
-                        self.collision_directions[direction] = True
+                blocked = blocked
+                regular_tile_blocked = blocked or not tile.soft_directions
 
-                    if self.stop_on_collision:
+                if self.stop_on_collision and tile.collision_mode=='hard':
+                    if blocked:
                         self.vel[axis] = 0
 
-                self.collided_tiles.add(tile)
+                if tile.collision_mode == 'hard':
+                    if regular_tile_blocked:
+                        v = Vector2(0, 0)
+                        v[axis] = delta
+                        if tile.is_solid:
+                            self.change_pos(-v)
+
+                    if direction and blocked:
+                        self.collision_directions[direction] = True
+
+                if self.name == 'player_2': print(f'{tile.soft_directions=}')
+                if regular_tile_blocked:
+                    print(f'adding {tile}')
+                    self.collided_tiles.add(tile)
                 # return
 
     def handle_coord_collision(self, tile):

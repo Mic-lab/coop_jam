@@ -54,7 +54,7 @@ class Level:
 
 
 p                                                                      p
-p                                                                      p
+p   1111111111111111111111111111111111111111                           p
 p                                                                      p
 p                                                                      p
 000000000000000000000000000000000000000000000000000000000000000000000000
@@ -69,6 +69,9 @@ p                                                                      p
                 pos = (x*config.TILE_SIZE[0], y*config.TILE_SIZE[1])
                 if c == '0':
                     tile = Tile(pos, 'ground', action='idle')
+                    tiles.append(tile)
+                if c == '1':
+                    tile = Tile(pos, 'platform', action='idle', is_platform=True)
                     tiles.append(tile)
                 if c == 'p':
                     tile = Tile(pos, 'portal', action='idle')
@@ -197,5 +200,9 @@ class GameMap:
 
 class Tile(Entity):
 
-    def __init__(self, pos, name, action=None):
-        super().__init__(pos, name, action)
+    def __init__(self, pos, name, action=None, is_platform=False):
+        if is_platform:
+            soft_directions = {'right', 'left', 'up'}
+        else:
+            soft_directions = None
+        super().__init__(pos, name, action, soft_directions=soft_directions)

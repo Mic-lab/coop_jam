@@ -43,6 +43,8 @@ class Player(PhysicsEntity):
         return self.jumping and self.vel[1] < 0
 
     def update(self, actions, rects=None):
+        # if actions['down']:
+        #     self.force_pass = True
 
         started_jump = False
         if actions['jump_pressed']:
@@ -151,6 +153,7 @@ class Player1(Player):
                 'jump_released': self.game.inputs['released'].get('w'),
                 'move_left': self.game.inputs['held'].get('a'),
                 'move_right': self.game.inputs['held'].get('d'),
+                'down': self.game.inputs['pressed'].get('s'),
                 }
 
         self.pull_request_timer.update()
@@ -191,6 +194,7 @@ class Player2(Player):
                 'jump_released': self.game.inputs['released'].get('up'),
                 'move_left': self.game.inputs['held'].get('left'),
                 'move_right': self.game.inputs['held'].get('right'),
+                'down': self.game.inputs['pressed'].get('down'),
                 }
 
         # if actions.get('move_left'):
@@ -203,6 +207,7 @@ class Player2(Player):
 
         if not self.pull_request_timer.done:  # TMP
             # if not player_1.pull_request_timer.done:
+            self.force_pass = True
             self.being_pulled = True
             vel = (Vec2(player_1.rect.center) - self.rect.center)
 
@@ -286,6 +291,8 @@ class Player2(Player):
                 # self.vel *= -0.3
                 self.game.end_freeze(3)
         else:
+            pass
+            # print(f'{self.force_pass=}')
             if self.being_pulled:
                 self.reset_pull()
 
@@ -296,6 +303,7 @@ class Player2(Player):
         sfx.sounds[f'pop.wav'].play()
         self.being_pulled = False
         self.bubble.animation.set_action('pop')
+        self.force_pass = False
 
     BUBBLE_SIZE = 16
     # BUBBLE_SIZE = 64
