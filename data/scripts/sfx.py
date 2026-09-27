@@ -26,8 +26,7 @@ def load_sounds():
         elif file.startswith('kill'):
             v = 1
         elif file.startswith('hit.wav'):
-            v = 0.2
-            v = 0
+            v = 0.7
         elif file.startswith('select.wav'):
             v = 1
         elif file.startswith('double_jump'):

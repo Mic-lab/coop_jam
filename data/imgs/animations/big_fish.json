@@ -1,11 +1,38 @@
 { "frames": [
    {
     "filename": "idle",
-    "frame": { "x": 0, "y": 0, "w": 58, "h": 53 },
+    "frame": { "x": 0, "y": 0, "w": 59, "h": 53 },
     "rotated": false,
     "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 58, "h": 53 },
-    "sourceSize": { "w": 58, "h": 53 },
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 59, "h": 53 },
+    "sourceSize": { "w": 59, "h": 53 },
+    "duration": 100
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 59, "y": 0, "w": 59, "h": 53 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 59, "h": 53 },
+    "sourceSize": { "w": 59, "h": 53 },
+    "duration": 100
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 118, "y": 0, "w": 59, "h": 53 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 59, "h": 53 },
+    "sourceSize": { "w": 59, "h": 53 },
+    "duration": 100
+   },
+   {
+    "filename": "idle",
+    "frame": { "x": 177, "y": 0, "w": 59, "h": 53 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 59, "h": 53 },
+    "sourceSize": { "w": 59, "h": 53 },
     "duration": 100
    }
  ],
@@ -14,7 +41,7 @@
   "version": "1.x-dev",
   "image": "big_fish.png",
   "format": "RGBA8888",
-  "size": { "w": 58, "h": 53 },
+  "size": { "w": 236, "h": 53 },
   "scale": "1",
   "slices": [
   ]

@@ -1,26 +1,44 @@
 import random
 import pygame
 from . import enemies
+from . import config, colors, sfx
+from .easing import lerp, ease_out_back
 from .timer import Timer
+from .font import fonts
 from abc import abstractmethod
 
 
 
 class Wave:
 
-    def __init__(self, game):
+    PAN = 8
+
+    def __init__(self, game, num):
         self.game = game
+        self.num = num
         self.t = 0
         self.done_spawning = False
 
+        self.text = fonts['title'].get_surf(f'Wave {num}')
+        self.text_bg = pygame.Surface((config.GAME_SIZE[0],
+                                       fonts['title'].obj.get_height()+2*self.PAN))
+        self.text_bg.fill(colors.DARK_RED)
+        self.start_timer = Timer(120)
+
     def update(self):
+        was_done = self.start_timer.done
+        self.start_timer.update()
         if self.done_spawning: return
+
+        if self.start_timer.done and not was_done:
+            pygame.mixer_music.set_volume(0.7)
+            sfx.play_music('song.wav')
         self.spawn_enemies()
         self.t += 1
 
     def spawn_enemy(self, Enemy: enemies.Fish, directions=(0, 1)):
         vel = pygame.Vector2(random.randint(10, 30), 0)
-        vel.rotate_ip(random.randint(-30, 30))
+        vel.rotate_ip(random.randint(-40, 40))
 
         if random.choice(directions):
             x = 100
@@ -35,10 +53,22 @@ class Wave:
     def spawn_enemies(self):
         pass
 
+    def render(self, surf):
+
+        pos = (0, lerp(100, 0, 1-ease_out_back(1-self.start_timer.ratio)))
+
+        self.text_bg.set_alpha((1-self.start_timer.ratio)*255)
+        surf.blit(self.text_bg, pos)
+        surf.blit(self.text,
+                  (0.5*(config.GAME_SIZE[0]-self.text.get_width()),
+                   pos[1]+self.PAN)
+                  )
+
+
 class Wave1(Wave):
 
-    def __init__(self, game):
-        super().__init__(game)
+    def __init__(self, game, n):
+        super().__init__(game, n)
         self.max_enemies = 30
         self.enemies_spawned = 0
 
@@ -54,6 +84,24 @@ class Wave1(Wave):
             if self.enemies_spawned == self.max_enemies:
                 self.done_spawning = True
 
+class Wave2(Wave):
+
+    def __init__(self, game, n):
+        super().__init__(game, n)
+        self.max_enemies = 120
+        self.enemies_spawned = 0
+
+    def spawn_enemies(self):
+        if self.t % 30 == 0:
+            if random.randint(0,1):
+                e = enemies.BigFish
+            else:
+                e = enemies.NormalFish
+            self.spawn_enemy(e, directions=[1])
+            self.enemies_spawned += 1
+            if self.enemies_spawned == self.max_enemies:
+                self.done_spawning = True
+
 
 class WaveManager:
 
@@ -61,9 +109,10 @@ class WaveManager:
         self.game = game
         self.wave_index = 0
         self.waves = (
-                Wave1(game),
-                Wave1(game),
-                Wave1(game),
+                None,
+                Wave1(game,1),
+                Wave2(game,2),
+                Wave2(game,3),
                 )
         self.wave_end_timer = Timer(120, done=True)
 
@@ -72,6 +121,8 @@ class WaveManager:
         return self.waves[self.wave_index]
 
     def update(self):
+        if not self.wave: return
+
         self.wave.update()
         level = self.game.game_map.level
 
@@ -94,7 +145,12 @@ class WaveManager:
         level.combo_manager.end_combo()
 
     def start_next_wave(self):
+        pygame.mixer_music.fadeout(1000)
         if self.wave_index == len(self.waves) - 1:
             print('done')
         else:
             self.wave_index += 1
+
+    def render(self, surf):
+        if not self.wave: return
+        self.wave.render(surf)

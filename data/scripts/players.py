@@ -43,8 +43,10 @@ class Player(PhysicsEntity):
         return self.jumping and self.vel[1] < 0
 
     def update(self, actions, rects=None):
-        # if actions['down']:
-        #     self.force_pass = True
+        if actions['down_pressed']:
+            self.force_pass = True
+        elif actions['down_released']:
+            self.force_pass = False
 
         started_jump = False
         if actions['jump_pressed']:
@@ -153,7 +155,8 @@ class Player1(Player):
                 'jump_released': self.game.inputs['released'].get('w'),
                 'move_left': self.game.inputs['held'].get('a'),
                 'move_right': self.game.inputs['held'].get('d'),
-                'down': self.game.inputs['pressed'].get('s'),
+                'down_pressed': self.game.inputs['pressed'].get('s'),
+                'down_released': self.game.inputs['released'].get('s'),
                 }
 
         self.pull_request_timer.update()
@@ -194,7 +197,8 @@ class Player2(Player):
                 'jump_released': self.game.inputs['released'].get('up'),
                 'move_left': self.game.inputs['held'].get('left'),
                 'move_right': self.game.inputs['held'].get('right'),
-                'down': self.game.inputs['pressed'].get('down'),
+                'down_pressed': self.game.inputs['pressed'].get('down'),
+                'down_released': self.game.inputs['released'].get('down'),
                 }
 
         # if actions.get('move_left'):

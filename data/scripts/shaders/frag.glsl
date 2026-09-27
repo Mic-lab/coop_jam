@@ -71,7 +71,7 @@ void main() {
         f_color.b = caSample3;
     }
 
-    if (f_color.rgb == vec3(0)) {
+    if (length(f_color.rgb - PURPLE_1) < 0.001) {
         float n1 = texture(noiseTex, uvsSPx + vec2(0.31, 0.37) + 0.001*vec2(t)).r;
         float n2 = texture(noiseTex, uvsSPx - 0.001*vec2(t)).r;
         float n = clamp(n1+n2, 0, 1);

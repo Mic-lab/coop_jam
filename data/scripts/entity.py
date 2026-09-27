@@ -168,7 +168,7 @@ class PhysicsEntity(Entity):
                 regular_tile_blocked = blocked or not tile.soft_directions
 
                 if self.stop_on_collision and tile.collision_mode=='hard':
-                    if blocked:
+                    if regular_tile_blocked:
                         self.vel[axis] = 0
 
                 if tile.collision_mode == 'hard':
@@ -178,12 +178,12 @@ class PhysicsEntity(Entity):
                         if tile.is_solid:
                             self.change_pos(-v)
 
-                    if direction and blocked:
+                    if direction and regular_tile_blocked:
                         self.collision_directions[direction] = True
 
-                if self.name == 'player_2': print(f'{tile.soft_directions=}')
+                # if self.name == 'player_2': print(f'{tile.soft_directions=}')
                 if regular_tile_blocked:
-                    print(f'adding {tile}')
+                    # print(f'adding {tile}')
                     self.collided_tiles.add(tile)
                 # return
 

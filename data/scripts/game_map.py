@@ -39,7 +39,7 @@ class Level:
         self.player_1 = Player1(self.game_map.game, name='side', pos=(x, -30), action='idle')
         self.player_2 = Player2(self.game_map.game, name='player_2', pos=(x, -30), action='idle')
         self.orb = Orb(self, (400, 74))
-        self.hp_bar = HpBar((0, 20), 20)
+        self.hp_bar = HpBar((0, 30), 20)
         self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
         self.enemies = []
         self.offset = self.desired_offset
@@ -99,8 +99,6 @@ p                                                                      p
     
     def hide_shop(self):
         self.shop.hide()
-        pygame.mixer_music.set_volume(0.7)
-        sfx.play_music('song.wav')
         self.wave_manager.start_next_wave()
 
 
@@ -109,8 +107,7 @@ p                                                                      p
 
         if game.inputs['pressed'].get('space') and self.tutorial:
             self.tutorial = False
-            pygame.mixer_music.set_volume(0.7)
-            sfx.play_music('song.wav')
+            self.wave_manager.start_next_wave()
 
         if game.inputs['pressed'].get('1'):
             self.show_shop()
@@ -127,8 +124,7 @@ p                                                                      p
             self.orb.update()
             self.hp_bar.update()
 
-            if not self.tutorial:
-                self.wave_manager.update()
+            self.wave_manager.update()
 
             new_enemies = []
             for enemy in self.enemies:
@@ -180,6 +176,8 @@ p                                                                      p
                     Animation.img_db['tutorial'],
                     0.5*Vec2(config.GAME_SIZE) + rounded_offset + (0, -400)
                     )
+
+        self.wave_manager.render(surf)
 
         shader_handler.vars['offset'] = self.offset
 
