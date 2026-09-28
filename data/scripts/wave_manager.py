@@ -30,11 +30,13 @@ class Wave:
         self.start_timer.update()
         if self.done_spawning: return
 
-        if self.start_timer.done and not was_done:
-            pygame.mixer_music.set_volume(0.7)
-            sfx.play_music('song.wav')
-        self.spawn_enemies()
-        self.t += 1
+        if self.start_timer.done:
+            if not was_done:
+                pygame.mixer_music.set_volume(0.7)
+                sfx.play_music('song.wav')
+
+            self.spawn_enemies()
+            self.t += 1
 
     def spawn_enemy(self, Enemy: enemies.Fish, directions=(0, 1)):
         vel = pygame.Vector2(random.randint(10, 30), 0)
@@ -97,7 +99,7 @@ class Wave2(Wave):
                 e = enemies.BigFish
             else:
                 e = enemies.NormalFish
-            self.spawn_enemy(e, directions=[1])
+            self.spawn_enemy(e, directions=[1, 0])
             self.enemies_spawned += 1
             if self.enemies_spawned == self.max_enemies:
                 self.done_spawning = True
