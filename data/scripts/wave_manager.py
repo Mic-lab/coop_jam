@@ -94,7 +94,7 @@ class Wave2(Wave):
         self.enemies_spawned = 0
 
     def spawn_enemies(self):
-        if self.t % 30 == 0:
+        if self.t % 100 == 0:
             if random.randint(0,1):
                 e = enemies.BigFish
             else:

@@ -38,7 +38,7 @@ class Level:
         x = ((self.size[0]+0.5)*config.TILE_SIZE[0])*0.5
         self.player_1 = Player1(self.game_map.game, name='side', pos=(x, -30), action='idle')
         self.player_2 = Player2(self.game_map.game, name='player_2', pos=(x, -30), action='idle')
-        self.orb = Orb(self, (400, 74))
+        self.orb = Orb(self, (450, 74))
         self.hp_bar = HpBar((0, 30), 20)
         self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
         self.enemies = []
@@ -48,16 +48,16 @@ class Level:
     def load_tiles(self):
         level_content = '''
 
-
-                       
-                                        
-
-
-p                                                                      p
-p   1111111111111111111111111111111111111111                           p
-p                                                                      p
-p                                                                      p
-000000000000000000000000000000000000000000000000000000000000000000000000
+p
+p                      
+p                                       
+p     11111     11111                     11111     11111
+p
+p                                                            p
+p   1111111111111111111                 1111111111111111111  p
+p                                                            p
+p                                                            p
+00000000000000000000000000000000000000000000000000000000000000
         '''
         tiles = []
         max_x = -1
@@ -90,7 +90,7 @@ p                                                                      p
     def desired_offset(self):
         # return Vec2(self.player_1.rect.topleft)
         # return -Vec2(self.player_1.rect.center) + 0.5*config.GAME_SIZE
-        return -0.5*(Vec2(self.player_1.rect.center)+self.player_2.rect.center) + 0.5*config.GAME_SIZE
+        return -1*(0.3*Vec2(self.player_1.rect.center)+0.3*Vec2(self.player_2.rect.center)+0.4*Vec2(self.orb.rect.center)) + 0.5*config.GAME_SIZE
 
     def show_shop(self):
         self.shop.show()

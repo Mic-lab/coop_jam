@@ -31,7 +31,9 @@ class Player(PhysicsEntity):
         self.wings = None
         self.show_wings = False
         self.did_double_jump = False
-        self.enable_double_jump()
+
+        self.can_double_jump = False
+        # self.enable_double_jump()
 
     def enable_double_jump(self):
         self.can_double_jump = True
@@ -59,6 +61,7 @@ class Player(PhysicsEntity):
 
         if actions['jump_pressed'] and not started_jump:
             if not self.grounded and self.can_double_jump and not self.did_double_jump:
+                print('DOUBLE JUMPING')
                 self.show_wings = True
                 self.wings.animation.set_action('idle', reset=True)
                 self.did_double_jump = True
@@ -206,7 +209,8 @@ class Player2(Player):
         # elif actions.get('move_right'):
         #     level.shop.show()
 
-        if self.game.inputs['pressed'].get('/'):
+        if self.game.inputs['pressed'].get('/') and not self.being_pulled:
+        # if self.game.inputs['pressed'].get('/'):
             self.pull_request()
 
         if not self.pull_request_timer.done:  # TMP
