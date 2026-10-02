@@ -42,6 +42,7 @@ class Level:
         self.hp_bar = HpBar((0, 30), 20)
         self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
         self.enemies = []
+        self.flakes = []
         self.offset = self.desired_offset
 
 
@@ -134,6 +135,16 @@ p                                                            p
                 new_enemies.append(enemy)
             self.enemies = new_enemies
 
+            new_flakes = []
+            for flake in self.flakes:
+                output = flake.update((self.player_1, *self.tiles))
+                if output.get('remove'):
+                    continue
+                new_flakes.append(flake)
+            self.flakes = new_flakes
+
+
+
         if self.hp_bar.val <= 0:
             self.restart()
 
@@ -157,7 +168,7 @@ p                                                            p
         self.player_2.render(surf, offset=rounded_offset)
         for tile in self.tiles:
             tile.render(surf, offset=rounded_offset)
-        for enemy in self.enemies:
+        for enemy in self.enemies + self.flakes:
             enemy.render(surf, offset=rounded_offset)
 
         for gen in self.particle_gens:

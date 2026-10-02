@@ -147,6 +147,7 @@ class Player1(Player):
     def __init__(self, game, *args, **kwargs):
         super().__init__(game, *args, **kwargs)
         self.pull_request_timer = Timer(60, done=True)
+        self.tag = 'player1'
 
     def update(self, rects=None):
 
