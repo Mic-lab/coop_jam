@@ -28,3 +28,10 @@ def ease_out_circ(x):
 def ease_out_back(x):
     return 1 + C3 * (x-1)**3 + C1 * (x-1)**2
 
+@ease
+def ease_in_out_quad(x):
+    if x < 0.5:
+        return 2 * x**2
+    else:
+        return 1 - (-2*x+2)**2 / 2
+    # return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;

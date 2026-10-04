@@ -28,6 +28,7 @@ class Shop:
 
         self.fish = Entity((0, 0), 'fish_shop', action='idle')
         self.fish.real_pos[1] = config.GAME_SIZE[1] - self.fish.rect.h
+        self.description_surf = None
 
     def show(self):
         self.showing = True
@@ -57,6 +58,9 @@ class Shop:
         if self.showing:
             self.update_buttons()
 
+    def generate_description_surf(self):
+        self.description_surf = fonts['shop'].get_surf(self.buttons[self.selected_button[1]].description)
+
     def update_buttons(self):
         ignore_mouse = True
         if self.game.inputs['game_mouse_pos'] != self.last_mouse_pos or self.game.inputs['pressed'].get('mouse1'):
@@ -69,6 +73,7 @@ class Shop:
             button.update(self.game.inputs, ignore_mouse=ignore_mouse)
             if button.selected and key != self.selected_button[1]:
                 new_selected_button = i, key
+                self.generate_description_surf()
             i += 1
 
         if ignore_mouse:
@@ -83,6 +88,7 @@ class Shop:
                 key = list(self.buttons)[new_index]
                 new_selected_button = new_index, key
                 self.buttons[key].select()
+                self.generate_description_surf()
 
         if new_selected_button:
             if self.selected_button:
@@ -128,6 +134,14 @@ class Shop:
         # print(self.fish.rect.x)
         self.fish.render(surf)
 
+        if self.description_surf:
+            x = t1 * (1-self.buttons[self.selected_button[1]].unselect_timer.ratio)
+            description_x = easing.lerp(config.GAME_SIZE[0],
+                                        config.GAME_SIZE[0] - 300,
+                                        easing.ease_in_out_quad(x))
+            surf.blit(self.description_surf,
+                      (description_x, 300))
+
         i = 0
         for key, button in self.buttons.items():
             btn_x = easing.lerp(config.GAME_SIZE[0], config.GAME_SIZE[0]-140-i*4, easing.ease_out_back(t2))
@@ -156,7 +170,7 @@ class Button:
 
     PRICE_SPACE = 20
     
-    def __init__(self, rect: pygame.Rect, text, preset, price, bg=None, click_sound=None):
+    def __init__(self, rect: pygame.Rect, text, preset, price, bg=None, click_sound=None, description=''):
         self.rect = pygame.Rect(rect)
         self.text = text
         self.preset = preset
@@ -167,6 +181,8 @@ class Button:
         self.disabled = False
         if bg is None: bg = Animation.img_db['button']
         self.bg = bg
+        self.description = description
+        self.description = 'Button description here waokeoaskdo '
         self.generate_surf()
         self.unselect_timer = Timer(8, done=True)
         self.click_sound = click_sound
@@ -180,20 +196,6 @@ class Button:
         self.generate_surf()
 
     def generate_surf(self):
-        # self.surf = pygame.Surface(self.rect.size)
-        # self.surf.set_colorkey((0, 0, 0))
-        # rect = pygame.Rect(0, 0, *self.rect.size)
-        # pygame.draw.rect(self.surf, self.colors['border'], rect, border_radius=2)
-        # x, y, w, h = rect
-        # x += 1
-        # y += 1
-        # w -= 2
-        # h -= 3
-        # pygame.draw.rect(self.surf, self.colors['fill'], (x, y, w, h), border_radius=2)
-        # # pygame.draw.aaline(self.surf, self.colors['text'], (x, y), (x, y + h - 2))
-        # # pygame.draw.aaline(self.surf, self.colors['text'], (x, y), (x + w - 1, y))
-        # self.surf.blit(text_img, (rect.centerx - text_img.get_width()*0.5,
-        #                      rect.centery - text_img.get_height()*0.5 - 1))
 
         s = pygame.Surface(pygame.Vector2(self.bg.get_size()) + (self.PRICE_SPACE, 0))
         s.blit(self.bg, (self.PRICE_SPACE, 0))

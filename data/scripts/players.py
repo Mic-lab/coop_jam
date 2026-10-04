@@ -18,7 +18,7 @@ class Player(PhysicsEntity):
     GRAVITY_UP = 0.15
     GRAVITY_DOWN = 0.25
 
-    def __init__(self, game, *args, **kwargs):
+    def __init__(self, game, *args, x_accel=0.6, **kwargs):
         self.game = game
         super().__init__(*args, **kwargs)
         self.grounded = False
@@ -27,6 +27,7 @@ class Player(PhysicsEntity):
         self.jump_timer = Timer(12, done=True)  # Jump buffer
         self.grounded_timer = Timer(6, done=True)  # Coyote time
         self.jump_force = 5
+        self.x_accel = x_accel
         
         self.wings = None
         self.show_wings = False
@@ -73,9 +74,9 @@ class Player(PhysicsEntity):
 
 
         if actions['move_left']:
-            self.vel[0] -= 0.5
+            self.vel[0] -= self.x_accel
         if actions['move_right']:
-            self.vel[0] += 0.5
+            self.vel[0] += self.x_accel
 
         self.vel[0] *= 0.9
         self.vel[0] = max(-3, min(3, self.vel[0]))
@@ -186,11 +187,10 @@ class Player2(Player):
 
     PULL_ACCELERATION = 0.17
     BUBBLE_GRAVITY = 0.13
-    BUBBLE_CONTROL = 0.12  # shouldnt be more than gravity, otherwise u can fly up
-    BUBBLE_CONTROL = 0.3
+    BUBBLE_CONTROL = 0.11  # shouldnt be more than gravity, otherwise u can fly up
 
     def __init__(self, game, *args, **kwargs):
-        super().__init__(game, *args, **kwargs)
+        super().__init__(game, *args, x_accel=0.2, **kwargs)
         self.being_pulled = False
         self.pull_request_timer = Timer(120)
         self.bubble = None
