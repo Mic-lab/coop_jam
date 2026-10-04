@@ -2,7 +2,7 @@ import pygame
 from pygame.math import clamp
 from .timer import Timer
 from .animation import Animation
-from . import easing, config, sfx
+from . import easing, config, sfx, colors
 from .font import fonts
 from .entity import Entity
 
@@ -19,10 +19,10 @@ class Shop:
             return (0, 80+i*(h+10), 150, h)
 
         self.buttons = {
-                'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', click_sound='buy.wav'),
-                'high_jump': Button(get_rect(1), 'P1: High jump', 'basic', click_sound='buy.wav'),
-                'button_3': Button(get_rect(2), 'P2: Hello world', 'basic', click_sound='buy.wav'),
-                'done': Button(get_rect(3), 'Done', 'basic', bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
+                'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', 1, click_sound='buy.wav'),
+                'high_jump': Button(get_rect(1), 'P1: High jump', 'basic', 2, click_sound='buy.wav'),
+                'button_3': Button(get_rect(2), 'P2: Hello world', 'basic', 3, click_sound='buy.wav'),
+                'done': Button(get_rect(3), 'Done', 'basic', 4, bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
                         }
         self.last_mouse_pos = None
 
@@ -153,11 +153,14 @@ class Button:
                        'text': [240, 240, 240] }
         },
     }
+
+    PRICE_SPACE = 20
     
-    def __init__(self, rect: pygame.Rect, text, preset, bg=None, click_sound=None):
+    def __init__(self, rect: pygame.Rect, text, preset, price, bg=None, click_sound=None):
         self.rect = pygame.Rect(rect)
         self.text = text
         self.preset = preset
+        self.price = price
         self.selected = False
         self.clicked = False
         self.released = False
@@ -192,13 +195,28 @@ class Button:
         # self.surf.blit(text_img, (rect.centerx - text_img.get_width()*0.5,
         #                      rect.centery - text_img.get_height()*0.5 - 1))
 
-        s = pygame.Surface(self.bg.get_size())
-        s.blit(self.bg)
+        s = pygame.Surface(pygame.Vector2(self.bg.get_size()) + (self.PRICE_SPACE, 0))
+        s.blit(self.bg, (self.PRICE_SPACE, 0))
         s.set_colorkey((0,0,0))
 
         text_img = fonts[self.presets[self.preset].get('font', 'shop')].get_surf(self.text, color=self.colors['text'])
-        s.blit(text_img, (16, 0.5*(s.get_height()-text_img.get_height())))
+        y = 0.5*(s.get_height()-text_img.get_height())
+        s.blit(text_img, (16 + self.PRICE_SPACE, y))
         self.surf = s
+        
+        if not self.disabled and not self.text == 'Done':
+            s.blit(Animation.img_db['flake_ui'], (0, 3))
+
+            price_img = fonts[self.presets[self.preset].get('font', 'shop')].get_surf(f'{self.price}', color=colors.BLACK)
+            price_pos = (5, y)
+            s.blit(price_img, price_pos + pygame.Vector2(0, 1))
+            s.blit(price_img, price_pos + pygame.Vector2(0, -1))
+            s.blit(price_img, price_pos + pygame.Vector2(1, 0))
+            s.blit(price_img, price_pos + pygame.Vector2(-1, 0))
+
+            price_img = fonts[self.presets[self.preset].get('font', 'shop')].get_surf(f'{self.price}', color=self.colors['text'])
+            s.blit(price_img, price_pos)
+
         
     def update(self, inputs, select_sound='select.wav', click_sound='click.wav', ignore_mouse=False):
         click_sound = self.click_sound

@@ -23,7 +23,7 @@ class Font:
 
 fonts = {
     'regular': Font('ProggyClean', 16, (240, 240, 240)),
-    'basic': Font('Minecraftia', 8, (240, 240, 240)),
+    'basic': Font('Minecraftia', 8, WHITE),
     'big': Font('m6x11', 16, WHITE),
     'shop': Font('dogica', 8, WHITE),
     'title': Font('VCR_OSD_MONO_1.001', 21, WHITE)

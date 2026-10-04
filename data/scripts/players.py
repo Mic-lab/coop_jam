@@ -15,8 +15,8 @@ class Player(PhysicsEntity):
     GRAVITY_UP = 0.15
     GRAVITY_DOWN = 0.9
 
-    GRAVITY_UP = 0.2
-    GRAVITY_DOWN = 0.5
+    GRAVITY_UP = 0.15
+    GRAVITY_DOWN = 0.25
 
     def __init__(self, game, *args, **kwargs):
         self.game = game
@@ -26,7 +26,7 @@ class Player(PhysicsEntity):
         self.jump_descent = True
         self.jump_timer = Timer(12, done=True)  # Jump buffer
         self.grounded_timer = Timer(6, done=True)  # Coyote time
-        self.jump_force = 6
+        self.jump_force = 5
         
         self.wings = None
         self.show_wings = False
@@ -187,6 +187,7 @@ class Player2(Player):
     PULL_ACCELERATION = 0.17
     BUBBLE_GRAVITY = 0.13
     BUBBLE_CONTROL = 0.12  # shouldnt be more than gravity, otherwise u can fly up
+    BUBBLE_CONTROL = 0.3
 
     def __init__(self, game, *args, **kwargs):
         super().__init__(game, *args, **kwargs)

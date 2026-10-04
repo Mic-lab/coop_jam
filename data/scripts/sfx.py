@@ -7,6 +7,7 @@ SOUNDS_DIR = os.path.join('data/sfx/sounds')
 MUSIC_DIR = os.path.join('data/sfx/music')
 
 def play_music(file_name, *args, loops=-1, **kwargs):
+    # return
     # Program freezes when there's music.fadeout
     # So for the music to forcefully play, the fadout must be stopped. 
     pygame.mixer.music.stop()
@@ -31,6 +32,10 @@ def load_sounds():
             v = 1
         elif file.startswith('double_jump'):
             v = 1
+        elif 'combo' in file:
+            v = 0.9
+        elif file == 'pickup.wav':
+            v = 0.3
         else:
             v = 0.6
 

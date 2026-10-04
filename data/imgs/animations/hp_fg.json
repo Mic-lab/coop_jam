@@ -4,8 +4,8 @@
     "frame": { "x": 0, "y": 0, "w": 165, "h": 22 },
     "rotated": false,
     "trimmed": true,
-    "spriteSourceSize": { "x": 12, "y": 0, "w": 165, "h": 22 },
-    "sourceSize": { "w": 179, "h": 24 },
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 165, "h": 22 },
+    "sourceSize": { "w": 167, "h": 24 },
     "duration": 100
    }
  ],
@@ -17,7 +17,7 @@
   "size": { "w": 165, "h": 22 },
   "scale": "1",
   "slices": [
-   { "name": "rect", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 34, "y": 9, "w": 128, "h": 4 } }] }
+   { "name": "rect", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 22, "y": 9, "w": 128, "h": 4 } }] }
   ]
  }
 }

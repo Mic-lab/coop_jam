@@ -46,6 +46,13 @@ void main() {
     vec2 uvsSPx = vec2(uvsPx.x, uvsPx.y * (screenSize.y/screenSize.x));
     vec2 uvsScreen = uvs*screenSize;
 
+    // this looks really cool: (make sure to disable ca tho)
+    // vec2 screenUvs = uvs;
+    // vec2 d = (uvs - vec2(0.5, 0.5));
+    // d *= 1*pow(length(d), 2);
+    // screenUvs -= d;
+    // f_color = vec4(texture(canvasTex, screenUvs).rgb, 1.0);
+
     float centerDist = distance(uvs, vec2(0.5, 0.5));
 
     // Blurry shake
@@ -90,6 +97,28 @@ void main() {
         }
         else {
             f_color.rgb = vec3(PURPLE_1);
+
+            float n = texture(noiseTex, 0.2*uvsPx+t*0.0005).r;
+
+            vec2 d = (uvs - vec2(0.5, 0.5));
+            d *= 200*pow(length(d), 2);
+            vec2 screenUvs = uvsPx*screenSize - 0.9*offset + 10*n;
+            screenUvs -= d;
+
+            if (mod(screenUvs.y, 100) < 50) {
+                if (mod(screenUvs.x, 100) < 50) {
+                    f_color.rg *= 0.95;
+                    f_color.b *= 0.98;
+                }
+            }
+            else {
+                if (mod(screenUvs.x+50, 100) < 50) {
+                    f_color.rg *= 0.95;
+                    f_color.b *= 0.98;
+                }
+
+            }
+
         }
 
     }

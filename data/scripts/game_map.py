@@ -30,7 +30,7 @@ class Level:
         pygame.mixer_music.set_volume(0.5)
         sfx.play_music('tutorial.wav')
 
-        self.combo_manager = ComboManager()
+        self.combo_manager = ComboManager(self)
         self.flake_indicator = FlakeIndicator()
         self.wave_manager = WaveManager(self.game)
 
@@ -42,10 +42,11 @@ class Level:
         self.player_2 = Player2(self.game_map.game, name='player_2', pos=(x, -30), action='idle')
         self.orb = Orb(self, (450, 74))
         self.hp_bar = HpBar((0, 30), 20)
-        self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.rect.w)
+        self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.img.get_width())
         self.enemies = []
         self.flakes = []
         self.offset = self.desired_offset
+        self.moving_surfs = []
 
 
     def load_tiles(self):
@@ -147,6 +148,15 @@ p                                                            p
             self.flakes = new_flakes
 
 
+        new_moving_surfs = []
+        for moving_surf in self.moving_surfs:
+            s = moving_surf['surf']
+            s.set_alpha(s.get_alpha() - moving_surf['alpha_change'])
+            if s.get_alpha() <= 0:
+                break
+            moving_surf['pos'] += moving_surf['vel']+Vec2(random.uniform(-1, 1), random.uniform(-1, 1))
+            new_moving_surfs.append(moving_surf)
+        self.moving_surfs = new_moving_surfs
 
         if self.hp_bar.val <= 0:
             self.restart()
@@ -178,13 +188,17 @@ p                                                            p
         for gen in self.particle_gens:
             gen.render(surf, offset=rounded_offset)
 
+        for moving_surf in self.moving_surfs:
+            surf.blit(moving_surf['surf'], moving_surf['pos']+rounded_offset)
+
         if not self.tutorial:
             self.hp_bar.render(surf)
 
         self.combo_manager.render(surf, (0, 0))
         self.shop.render(surf)
 
-        self.flake_indicator.render(surf)
+        if not self.tutorial:
+            self.flake_indicator.render(surf)
 
         if self.tutorial:
             img = Animation.img_db['tutorial']

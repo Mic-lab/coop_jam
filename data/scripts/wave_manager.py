@@ -28,7 +28,7 @@ class Wave:
         self.start_timer = Timer(120)
 
     def spawn_flake(self):
-        flake = Flake(self.game, pos=(0+random.randint(1, 300), 0))
+        flake = Flake(self.game, pos=(0+random.randint(30, 920), 0))
         self.game.game_map.level.flakes.append(flake)
 
     def update(self):
@@ -43,7 +43,7 @@ class Wave:
 
             self.spawn_enemies()
 
-            if self.t % (1*60) == 0:
+            if self.t % (1*120) == 0:
                 self.spawn_flake()
 
             self.t += 1
