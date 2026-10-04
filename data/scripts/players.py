@@ -1,8 +1,9 @@
+import pygame
 from pygame import Vector2 as Vec2
 from .entity import PhysicsEntity, Entity
 from .timer import Timer
 import random
-from . import sfx
+from . import sfx, utils, animation, colors
 from .particle import ParticleGenerator
 
 def scale_to_length(vector, length):
@@ -35,6 +36,8 @@ class Player(PhysicsEntity):
 
         self.can_double_jump = False
         # self.enable_double_jump()
+        self.x_max = 3
+
 
     def enable_double_jump(self):
         self.can_double_jump = True
@@ -62,7 +65,6 @@ class Player(PhysicsEntity):
 
         if actions['jump_pressed'] and not started_jump:
             if not self.grounded and self.can_double_jump and not self.did_double_jump:
-                print('DOUBLE JUMPING')
                 self.show_wings = True
                 self.wings.animation.set_action('idle', reset=True)
                 self.did_double_jump = True
@@ -79,7 +81,7 @@ class Player(PhysicsEntity):
             self.vel[0] += self.x_accel
 
         self.vel[0] *= 0.9
-        self.vel[0] = max(-3, min(3, self.vel[0]))
+        self.vel[0] = max(-self.x_max, min(self.x_max, self.vel[0]))
 
         if self.vel[1] > 0:
             self.jump_descent = True
@@ -150,10 +152,20 @@ class Player1(Player):
         self.pull_request_timer = Timer(60, done=True)
         self.tag = 'player1'
 
+        ghost_surf = animation.Animation.get_animation_img('side')
+        ghost_surf = pygame.mask.from_surface(ghost_surf).to_surface()
+        c = colors.GRAY_1
+        c = (30, 30, 70)
+        ghost_surf = utils.swap_colors(ghost_surf, (255, 255, 255), c)
+        ghost_surf.set_colorkey((0, 0, 0))
+        self.ghost_surf = ghost_surf
+
+        self.ghost_surfs = []
+        self.t = 0
+
     def update(self, rects=None):
 
-        # if self.game.inputs['pressed'].get('e'):
-        #     self.pull_request_timer.reset()
+        self.t += 1
 
         actions = {
                 'jump_pressed': self.game.inputs['pressed'].get('w'),
@@ -173,7 +185,26 @@ class Player1(Player):
         elif self.vel[0] > 0:
             self.animation.flip[0] = False
 
+        new_ghost_surfs = []
+        for ghost_surf, pos in self.ghost_surfs:
+            a = ghost_surf.get_alpha()
+            if a is None: a = 255
+            ghost_surf.set_alpha(a - 10)
+            if ghost_surf.get_alpha() <= 0:
+                continue
+            new_ghost_surfs.append((ghost_surf, pos))
+        self.ghost_surfs = new_ghost_surfs
 
+        if abs(self.vel.x) > 4:
+            if self.t % 3 == 0:
+                self.ghost_surfs.append(
+                        (self.ghost_surf.copy(), self.pos)
+                        )
+
+    def render(self, surf, offset=(0, 0)):
+        for ghost_surf, pos in self.ghost_surfs:
+            surf.blit(ghost_surf, pos+Vec2(offset))
+        super().render(surf, offset)
 
 
 class Player2(Player):
@@ -196,6 +227,10 @@ class Player2(Player):
         self.bubble = None
         self.kill = 0
 
+        self.bubble_name = 'bubble'
+        self.kill_reset = False
+        self.got_kill = False
+
     def update(self, rects=None):
         level = self.game.game_map.level
         self.kills = 0
@@ -215,9 +250,16 @@ class Player2(Player):
         # elif actions.get('move_right'):
         #     level.shop.show()
 
-        if self.game.inputs['pressed'].get('/') and not self.being_pulled:
-        # if self.game.inputs['pressed'].get('/'):
-            self.pull_request()
+        if self.game.inputs['pressed'].get('/'):
+            print(f'{self.kill_reset=} {self.got_kill=}')
+            if self.kill_reset and self.got_kill:
+                self.pull_request()
+            elif not self.being_pulled:
+                self.pull_request()
+
+        # if self.game.inputs['pressed'].get('/') and not self.being_pulled:
+        # # if self.game.inputs['pressed'].get('/'):
+        #     self.pull_request()
 
         if not self.pull_request_timer.done:  # TMP
             # if not player_1.pull_request_timer.done:
@@ -229,7 +271,7 @@ class Player2(Player):
             # vel *= 0.8
 
             self.vel = vel
-            self.bubble = Entity((0, 0), 'bubble', 'idle')
+            self.bubble = Entity((0, 0), self.bubble_name, 'idle')
 
             self.pull_request_timer.reset(done=True)
             player_1.pull_request_timer.reset(done=True)
@@ -304,6 +346,7 @@ class Player2(Player):
                 sfx.sounds[f'kill_{random.randint(1, 4)}.wav'].play()
                 # self.vel *= -0.3
                 self.game.end_freeze(3)
+                self.got_kill = True
         else:
             pass
             # print(f'{self.force_pass=}')
@@ -313,14 +356,15 @@ class Player2(Player):
         return super().on_collision(entity)
 
     def reset_pull(self):
+        self.got_kill = False
         self.game.game_map.level.combo_manager.end_combo()
         sfx.sounds[f'pop.wav'].play()
         self.being_pulled = False
         self.bubble.animation.set_action('pop')
         self.force_pass = False
 
-    BUBBLE_SIZE = 16
+    bubble_size = 16
     # BUBBLE_SIZE = 64
 
     def handle_coord_collision(self, tile):
-        return (Vec2(self.rect.center) - tile.center).length() < (self.BUBBLE_SIZE+5)
+        return (Vec2(self.rect.center) - tile.center).length() < (self.bubble_size+8)

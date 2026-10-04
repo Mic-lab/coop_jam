@@ -1,0 +1,41 @@
+{ "frames": [
+   {
+    "filename": "idle",
+    "frame": { "x": 0, "y": 0, "w": 55, "h": 55 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 55, "h": 55 },
+    "sourceSize": { "w": 55, "h": 55 },
+    "duration": 100
+   },
+   {
+    "filename": "pop",
+    "frame": { "x": 55, "y": 0, "w": 55, "h": 55 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 55, "h": 55 },
+    "sourceSize": { "w": 55, "h": 55 },
+    "duration": 50
+   },
+   {
+    "filename": "pop",
+    "frame": { "x": 110, "y": 0, "w": 55, "h": 55 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 55, "h": 55 },
+    "sourceSize": { "w": 55, "h": 55 },
+    "duration": 50
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.x-dev",
+  "image": "big_bubble.png",
+  "format": "RGBA8888",
+  "size": { "w": 165, "h": 55 },
+  "scale": "1",
+  "slices": [
+   { "name": "rect", "color": "#0000ffff", "keys": [{ "frame": 0, "bounds": {"x": 0, "y": 0, "w": 55, "h": 55 } }] }
+  ]
+ }
+}

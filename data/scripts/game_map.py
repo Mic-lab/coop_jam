@@ -58,7 +58,7 @@ p
 p     11111     11111                     11111     11111
 p
 p                                                            p
-p   1111111111111111111                 1111111111111111111  p
+p   1111111111111111111   111     111   1111111111111111111  p
 p                                                            p
 p                                                            p
 00000000000000000000000000000000000000000000000000000000000000
@@ -94,7 +94,7 @@ p                                                            p
     def desired_offset(self):
         # return Vec2(self.player_1.rect.topleft)
         # return -Vec2(self.player_1.rect.center) + 0.5*config.GAME_SIZE
-        return -1*(0.3*Vec2(self.player_1.rect.center)+0.3*Vec2(self.player_2.rect.center)+0.4*Vec2(self.orb.rect.center)) + 0.5*config.GAME_SIZE
+        return -1*(0.25*Vec2(self.player_1.rect.center)+0.25*Vec2(self.player_2.rect.center)+0.5*Vec2(self.orb.rect.center)) + 0.5*config.GAME_SIZE
 
     def show_shop(self):
         self.shop.show()
@@ -105,6 +105,9 @@ p                                                            p
     def hide_shop(self):
         self.shop.hide()
         self.wave_manager.start_next_wave()
+        # Fixes a bug: if u hold down before shop shows then release, it thinks ur still holding down
+        self.player_1.force_pass = False
+        self.player_2.force_pass = False
 
 
     def update(self):

@@ -4,7 +4,7 @@ from pygame import Vector2 as Vec2
 from .timer import Timer
 from .font import fonts
 from .easing import lerp, ease_out_elastic
-from . import easing, sfx
+from . import easing, sfx, colors
 from .mgl import shader_handler
 from .flake_indicator import Flake
 
@@ -55,6 +55,19 @@ class ComboManager:
         sfx.sounds['combo_end.wav'].play()
         self.level.flake_indicator.add_flake(self.gained_flakes)
         self.gained_flakes = 0
+
+        if self.kills >= 5 or 1:
+            hp_gain = self.kills-4
+            hp_gain = abs(hp_gain)
+            self.level.hp_bar.change_val(hp_gain)
+            surf = fonts['big'].get_surf(f'+{hp_gain} HP Bonus', color=colors.WHITE)
+            surf.set_alpha(254)
+            self.level.moving_surfs.append({
+                'surf': surf,
+                'vel': (0, -1),
+                'alpha_change': 5,
+                'pos': pygame.Vector2(self.level.player_2.rect.center),
+                })
 
     def render(self, surf, offset):
         kills = self.kills if self.showing else self.old_kills

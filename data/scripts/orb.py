@@ -18,6 +18,7 @@ class HpBar(Entity):
 
     def change_val(self, val_change):
         self.val += val_change
+        self.val = max(min(self.val, self.max_val), 0)
 
     def render(self, surf, offset=(0,0)):
         rect = self.rect

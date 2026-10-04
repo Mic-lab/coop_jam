@@ -164,6 +164,11 @@ void main() {
     f_color *= mix(0.9, 1, random2d(uvs));
 
 
+    // float r = f_color.r;
+    // float g = f_color.g;
+    // float b = f_color.b;
+
+
     /*
     0  No transition
     1  Starting transition

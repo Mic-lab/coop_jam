@@ -167,3 +167,7 @@ class Animation:
         self.animation_frame = 0
         self.game_frame = 0
 
+
+    @classmethod
+    def get_animation_img(cls, name, action='idle', frame=0):
+        return cls.animation_db[name]['frames'][action][frame]['img']

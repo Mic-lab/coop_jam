@@ -21,8 +21,10 @@ class Shop:
         self.buttons = {
                 'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', 1, click_sound='buy.wav'),
                 'high_jump': Button(get_rect(1), 'P1: High jump', 'basic', 2, click_sound='buy.wav'),
-                'button_3': Button(get_rect(2), 'P2: Hello world', 'basic', 3, click_sound='buy.wav'),
-                'done': Button(get_rect(3), 'Done', 'basic', 4, bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
+                'sprint': Button(get_rect(2), 'P1: Sprint', 'basic', 30, click_sound='buy.wav'),
+                'big_bubble': Button(get_rect(3), 'P2: Big Bubble', 'basic', 40, click_sound='buy.wav'),
+                'kill_reset': Button(get_rect(4), 'P2: Bubble Kill Reset', 'basic', 40, click_sound='buy.wav'),
+                'done': Button(get_rect(5), 'Done', 'basic', 4, bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
                         }
         self.last_mouse_pos = None
 
@@ -113,6 +115,14 @@ class Shop:
                 player_1.enable_double_jump()
             elif btn_name == 'high_jump':
                 player_1.jump_force = 8
+            elif btn_name == 'sprint':
+                player_1.x_accel = 1
+                player_1.x_max = 5
+            elif btn_name == 'big_bubble':
+                player_2.bubble_name = 'big_bubble'
+                player_2.bubble_size = 21
+            elif btn_name == 'kill_reset':
+                player_2.kill_reset = True
 
 
     def render(self, surf):
@@ -209,14 +219,15 @@ class Button:
         if not self.disabled and not self.text == 'Done':
             s.blit(Animation.img_db['flake_ui'], (0, 3))
 
-            price_img = fonts[self.presets[self.preset].get('font', 'shop')].get_surf(f'{self.price}', color=colors.BLACK)
-            price_pos = (5, y)
+            font = fonts[self.presets[self.preset].get('font', 'basic')]
+            price_img = font.get_surf(f'{self.price}', color=colors.BLACK)
+            price_pos = (8, s.get_height()*0.5) - 0.5*pygame.Vector2(price_img.get_size())
             s.blit(price_img, price_pos + pygame.Vector2(0, 1))
             s.blit(price_img, price_pos + pygame.Vector2(0, -1))
             s.blit(price_img, price_pos + pygame.Vector2(1, 0))
             s.blit(price_img, price_pos + pygame.Vector2(-1, 0))
 
-            price_img = fonts[self.presets[self.preset].get('font', 'shop')].get_surf(f'{self.price}', color=self.colors['text'])
+            price_img = font.get_surf(f'{self.price}', color=self.colors['text'])
             s.blit(price_img, price_pos)
 
         

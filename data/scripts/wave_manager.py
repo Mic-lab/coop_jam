@@ -28,7 +28,7 @@ class Wave:
         self.start_timer = Timer(120)
 
     def spawn_flake(self):
-        flake = Flake(self.game, pos=(0+random.randint(30, 920), 0))
+        flake = Flake(self.game, pos=(0+random.randint(30, 920), -100))
         self.game.game_map.level.flakes.append(flake)
 
     def update(self):
@@ -114,6 +114,26 @@ class Wave2(Wave):
             if self.enemies_spawned == self.max_enemies:
                 self.done_spawning = True
 
+class Wave3(Wave):
+
+    def __init__(self, game, n):
+        super().__init__(game, n)
+        self.max_enemies = 120
+        self.enemies_spawned = 0
+
+    def spawn_enemies(self):
+        if self.t % 60 == 0:
+            if random.randint(0,1):
+                e = enemies.BigFish
+            elif random.randint(0, 1):
+                e = enemies.DashFish
+            else:
+                e = enemies.NormalFish
+            self.spawn_enemy(e, directions=[1, 0])
+            self.enemies_spawned += 1
+            if self.enemies_spawned == self.max_enemies:
+                self.done_spawning = True
+
 
 class WaveManager:
 
@@ -124,7 +144,7 @@ class WaveManager:
                 None,
                 Wave1(game,1),
                 Wave2(game,2),
-                Wave2(game,3),
+                Wave3(game,3),
                 )
         self.wave_end_timer = Timer(120, done=True)
 
