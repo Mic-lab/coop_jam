@@ -1,5 +1,3 @@
-# test
-
 import sys
 import pygame
 from data.scripts import config

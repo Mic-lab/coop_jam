@@ -5,7 +5,7 @@ uniform sampler2D noiseTex;
 uniform float transitionTimer;
 uniform int transitionState;
 uniform float shakeTimer = -1.0;
-uniform float caTimer = -1.0;
+uniform float caTimer = 0;
 uniform float t;
 uniform float killTimer = -1.0;
 uniform float comboShowTimer = -1.0;
@@ -60,8 +60,9 @@ void main() {
     }
 
     // Chromatic abberation
-    if (caTimer >= 0.0) {
-        float caIntensity = caTimer*centerDist * caCoef;
+    float caTimer2 = caTimer + 0.15;
+    if (caTimer2 >= 0.0) {
+        float caIntensity = caTimer2*centerDist * caCoef;
         vec2 sampleVec = vec2(0.0, caIntensity);
         float caSample1 = texture(canvasTex, uvs + sampleVec).r;
         float caSample2 = texture(canvasTex, uvs - rotateVec(sampleVec, 2.0*PI/3.0)).g;
@@ -93,7 +94,14 @@ void main() {
 
     }
 
-    if (uvsScreen.y > 40 && uvsScreen.y < 55) {
+    if (length(f_color.rgb - vec3(0, 1, 1)) < 0.001) {
+        float n = texture(noiseTex, 5*vec2(uvsS-offset/screenSize+0.0005*vec2(0, t))).r;
+        f_color.rgb = vec3(0, 0.1+pow(n, 0.5), 1.2*n);
+        // f_color.rgb = vec3(0, 1-n, 1.2*n);
+    }
+
+
+    if (uvsScreen.y > 65 && uvsScreen.y < 80) {
 
         if (length(f_color.rgb - WHITE) > 0.001) {
 
@@ -119,8 +127,12 @@ void main() {
 
     }
 
-    // f_color.g *= 1-1.1*centerDist* mix(0.5, 1, random2d(uvs));
-    // f_color *= mix(0.5, 1, random2d(uvs));
+    float vignette = 1*centerDist* mix(0.5, 1, random2d(uvs));
+    vignette -= 0.4;
+    f_color.r *= 1-vignette;
+    f_color.g *= 1-0.9*vignette;
+    f_color.b *= 1-0.8*vignette;
+    f_color *= mix(0.9, 1, random2d(uvs));
 
 
     /*

@@ -13,6 +13,7 @@ from .orb import Orb, HpBar
 from .shop import Shop
 from .wave_manager import WaveManager
 from .animation import Animation
+from .flake_indicator import FlakeIndicator
 
 class Level:
 
@@ -30,6 +31,7 @@ class Level:
         sfx.play_music('tutorial.wav')
 
         self.combo_manager = ComboManager()
+        self.flake_indicator = FlakeIndicator()
         self.wave_manager = WaveManager(self.game)
 
         self.shop = Shop(self.game_map.game)
@@ -97,6 +99,7 @@ p                                                            p
         self.shop.show()
         pygame.mixer_music.set_volume(1)
         sfx.play_music('shop.wav')
+        self.combo_manager.end_combo()
     
     def hide_shop(self):
         self.shop.hide()
@@ -154,6 +157,7 @@ p                                                            p
         ParticleGenerator.update_generators(self.particle_gens)
 
         self.combo_manager.update()
+        self.flake_indicator.update()
         self.shop.update()
 
     def restart(self):
@@ -178,8 +182,9 @@ p                                                            p
             self.hp_bar.render(surf)
 
         self.combo_manager.render(surf, (0, 0))
-
         self.shop.render(surf)
+
+        self.flake_indicator.render(surf)
 
         if self.tutorial:
             img = Animation.img_db['tutorial']

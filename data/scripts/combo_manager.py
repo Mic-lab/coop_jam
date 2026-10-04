@@ -44,13 +44,14 @@ class ComboManager:
         img = pygame.transform.scale(img, (img.get_width()*scale[0], img.get_height()*scale[1]))
         img = pygame.transform.rotate(img, lerp(random.randint(-20, 20), 0, x))
 
+        y = 75
         hiding_timer_ratio = 1-self.hiding_timer.ratio
         if self.showing:
-            surf.blit(img, (550, 50 ) - 0.5*Vec2(img.get_size()))
+            surf.blit(img, (550, y) - 0.5*Vec2(img.get_size()))
             shader_handler.vars['comboShowTimer'] = 1
         else:
             showing_timer_ratio = easing.ease_out_back(hiding_timer_ratio)
-            surf.blit(img, (550 + (1-showing_timer_ratio)*150, 50 ) - 0.5*Vec2(img.get_size()))
+            surf.blit(img, (550 + (1-showing_timer_ratio)*150, y ) - 0.5*Vec2(img.get_size()))
             shader_handler.vars['comboShowTimer'] = hiding_timer_ratio
 
         shader_handler.vars['killTimer'] = self.kill_timer.ratio

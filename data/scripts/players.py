@@ -184,6 +184,10 @@ class Player2(Player):
     BUBBLE_GRAVITY = 0.1
     BUBBLE_CONTROL = 0.09  # shouldnt be more than gravity, otherwise u can fly up
 
+    PULL_ACCELERATION = 0.17
+    BUBBLE_GRAVITY = 0.13
+    BUBBLE_CONTROL = 0.12  # shouldnt be more than gravity, otherwise u can fly up
+
     def __init__(self, game, *args, **kwargs):
         super().__init__(game, *args, **kwargs)
         self.being_pulled = False

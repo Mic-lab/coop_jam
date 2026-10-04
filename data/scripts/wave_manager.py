@@ -6,6 +6,7 @@ from . import config, colors, sfx
 from .easing import lerp, ease_out_back
 from .timer import Timer
 from .font import fonts
+from .flake_indicator import Flake
 from abc import abstractmethod
 
 
@@ -27,7 +28,7 @@ class Wave:
         self.start_timer = Timer(120)
 
     def spawn_flake(self):
-        flake = Flake(name='player_2', pos=(0+random.randint(1, 300), 0), action='idle')
+        flake = Flake(self.game, pos=(0+random.randint(1, 300), 0))
         self.game.game_map.level.flakes.append(flake)
 
     def update(self):
@@ -167,31 +168,3 @@ class WaveManager:
         self.wave.render(surf)
 
 
-class Flake(PhysicsEntity):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.remove = False
-        self.timer = Timer(60*6)
-
-    def update(self, rects=None):
-        self.vel[1] += 0.1
-        if self.timer.done:
-            self.remove = True
-        self.timer.update()
-        super().update(rects)
-        return {'remove': self.remove}
-
-    def on_collision(self, entity):
-        if entity.tag == 'player1':
-            self.remove = True
-        return super().on_collision(entity)
-
-    def render(self, *args, **kwargs):
-        render = True
-        if self.timer.ratio > 0.8:
-            if (self.timer.frame % 6) >= 3:
-                render = False
-            
-        if render:
-            return super().render(*args, **kwargs)
