@@ -49,7 +49,7 @@ class Wave:
             self.t += 1
 
     def spawn_enemy(self, Enemy: enemies.Fish, directions=(0, 1)):
-        vel = pygame.Vector2(random.randint(10, 30), 0)
+        vel = pygame.Vector2(random.randint(2, 5), 0)
         vel.rotate_ip(random.randint(-40, 40))
 
         if random.choice(directions):
@@ -58,6 +58,7 @@ class Wave:
             x = 900
             vel.x *= -1
         y = 100
+        # y = random.randint(-200, 50)
         enemy = Enemy(self.game, pos=(x, y), vel=vel)
         self.game.game_map.level.enemies.append(enemy)
 
@@ -100,19 +101,53 @@ class Wave2(Wave):
 
     def __init__(self, game, n):
         super().__init__(game, n)
-        self.max_enemies = 120
+        self.max_enemies = 60
         self.enemies_spawned = 0
 
     def spawn_enemies(self):
-        if self.t % 100 == 0:
-            if random.randint(0,1):
+        if self.t % 60 == 0:
+
+            if random.randint(0,4):
                 e = enemies.BigFish
             else:
                 e = enemies.NormalFish
-            self.spawn_enemy(e, directions=[1, 0])
+
+            if self.t % 60*200 < 60*100:
+                directions = [1]
+            else:
+                directions = [0]
+
+            self.spawn_enemy(e, directions=directions)
             self.enemies_spawned += 1
             if self.enemies_spawned == self.max_enemies:
                 self.done_spawning = True
+
+class Wave2(Wave):
+
+    def __init__(self, game, n):
+        super().__init__(game, n)
+        self.max_enemies = 40
+        self.enemies_spawned = 0
+        self.direction = 0
+
+    def spawn_enemies(self):
+        if self.t <= 30*4:
+            if self.t % 30 == 0:
+
+                # if random.randint(0,4):
+                #     e = enemies.BigFish
+                # else:
+                #     e = enemies.NormalFish
+                e = enemies.BigFish
+
+                self.spawn_enemy(e, directions=[ self.direction ])
+                self.enemies_spawned += 1
+                if self.enemies_spawned == self.max_enemies:
+                    self.done_spawning = True
+
+        if self.t == 60*4:
+            self.t = 0
+            self.direction = (self.direction+1)%2
 
 class Wave3(Wave):
 

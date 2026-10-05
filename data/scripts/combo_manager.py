@@ -26,7 +26,7 @@ class ComboManager:
         self.kills += kill_count
 
         if self.kills > 1:
-            k = min(self.kills-1, 5)
+            k = min(self.kills, 5)
             sfx.sounds[f'combo_{k}.wav'].play()
             self.gained_flakes += k
             self.flake_surf = fonts['basic'].get_surf(f'(+{self.gained_flakes}           )')
@@ -56,9 +56,8 @@ class ComboManager:
         self.level.flake_indicator.add_flake(self.gained_flakes)
         self.gained_flakes = 0
 
-        if self.kills >= 5 or 1:
+        if self.kills >= 5:
             hp_gain = self.kills-4
-            hp_gain = abs(hp_gain)
             self.level.hp_bar.change_val(hp_gain)
             surf = fonts['big'].get_surf(f'+{hp_gain} HP Bonus', color=colors.WHITE)
             surf.set_alpha(254)

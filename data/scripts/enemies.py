@@ -190,4 +190,4 @@ class DashFish(Fish):
         self.vel += accel
         self.vel *= 0.9
 
-        self.t += random.randint(3, 5)
+        self.t += random.randint(2, 3)

@@ -22,7 +22,7 @@ class Shop:
                 'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', 1, click_sound='buy.wav'),
                 'high_jump': Button(get_rect(1), 'P1: High jump', 'basic', 2, click_sound='buy.wav'),
                 'sprint': Button(get_rect(2), 'P1: Sprint', 'basic', 30, click_sound='buy.wav'),
-                'big_bubble': Button(get_rect(3), 'P2: Big Bubble', 'basic', 40, click_sound='buy.wav'),
+                'big_bubble': Button(get_rect(3), 'P2: Big Bubble', 'basic', 30, click_sound='buy.wav'),
                 'kill_reset': Button(get_rect(4), 'P2: Bubble Kill Reset', 'basic', 40, click_sound='buy.wav'),
                 'done': Button(get_rect(5), 'Done', 'basic', 4, bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
                         }

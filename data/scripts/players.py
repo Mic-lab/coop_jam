@@ -254,6 +254,7 @@ class Player2(Player):
             print(f'{self.kill_reset=} {self.got_kill=}')
             if self.kill_reset and self.got_kill:
                 self.pull_request()
+                self.got_kill = False
             elif not self.being_pulled:
                 self.pull_request()
 
