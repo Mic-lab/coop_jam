@@ -100,8 +100,8 @@ void main() {
 
             float n = texture(noiseTex, 0.2*uvsPx+t*0.0005).r;
 
-            vec2 d = (uvs - vec2(0.5, 0.5));
-            d *= 200*pow(length(d), 2);
+            vec2 d = (uvsS - vec2(0.5, 0.5));
+            d *= 300*pow(length(d), 2);
             vec2 screenUvs = uvsPx*screenSize - 0.9*offset + 10*n;
             screenUvs -= d;
 

@@ -19,12 +19,12 @@ class Shop:
             return (0, 80+i*(h+10), 150, h)
 
         self.buttons = {
-                'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', 1, click_sound='buy.wav'),
-                'high_jump': Button(get_rect(1), 'P1: High jump', 'basic', 2, click_sound='buy.wav'),
-                'sprint': Button(get_rect(2), 'P1: Sprint', 'basic', 30, click_sound='buy.wav'),
-                'big_bubble': Button(get_rect(3), 'P2: Big Bubble', 'basic', 30, click_sound='buy.wav'),
-                'kill_reset': Button(get_rect(4), 'P2: Bubble Kill Reset', 'basic', 40, click_sound='buy.wav'),
-                'done': Button(get_rect(5), 'Done', 'basic', 4, bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
+                'double_jump': Button(get_rect(0), 'P1: Double Jump', 'basic', 10, click_sound='buy.wav'),
+                # 'high_jump': Button(get_rect(0), 'P1: High jump', 'basic', 10, click_sound='buy.wav'),
+                'sprint': Button(get_rect(1), 'P1: Sprint', 'basic', 30, click_sound='buy.wav'),
+                'big_bubble': Button(get_rect(2), 'P2: Big Bubble', 'basic', 30, click_sound='buy.wav'),
+                'kill_reset': Button(get_rect(3), 'P2: Bubble Kill Reset', 'basic', 40, click_sound='buy.wav'),
+                'done': Button(get_rect(4), 'Done', 'basic', 4, bg=Animation.img_db['button_done'], click_sound='shop_exit.wav')
                         }
         self.last_mouse_pos = None
 
@@ -101,14 +101,24 @@ class Shop:
         if self.game.inputs['pressed'].get('space') or self.game.inputs['pressed'].get('/'):
             btn.click()
         if btn.clicked:
-            btn.bg = Animation.img_db['button_disabled']
-            player_1 = self.game.game_map.level.player_1
-            player_2 = self.game.game_map.level.player_2
-            btn_name = self.selected_button[1]
 
+            btn_name = self.selected_button[1]
             if btn_name == 'done':
                 self.game.game_map.level.hide_shop()
                 return
+
+
+            new_price = self.game.game_map.level.flake_indicator.flakes - btn.price
+            if new_price >= 0:
+                self.game.game_map.level.flake_indicator.flakes = new_price
+                self.game.game_map.level.flake_indicator.add_flake(0)
+            else:
+                return
+
+            btn.bg = Animation.img_db['button_disabled']
+            player_1 = self.game.game_map.level.player_1
+            player_2 = self.game.game_map.level.player_2
+
 
             btn.disable()
             if btn_name == 'double_jump':

@@ -153,11 +153,11 @@ class Wave3(Wave):
 
     def __init__(self, game, n):
         super().__init__(game, n)
-        self.max_enemies = 120
+        self.max_enemies = 30
         self.enemies_spawned = 0
 
     def spawn_enemies(self):
-        if self.t % 60 == 0:
+        if self.t % 70 == 0:
             if random.randint(0,1):
                 e = enemies.BigFish
             elif random.randint(0, 1):
@@ -165,6 +165,27 @@ class Wave3(Wave):
             else:
                 e = enemies.NormalFish
             self.spawn_enemy(e, directions=[1, 0])
+            self.enemies_spawned += 1
+            if self.enemies_spawned == self.max_enemies:
+                self.done_spawning = True
+
+class Wave4(Wave):
+
+    def __init__(self, game, n):
+        super().__init__(game, n)
+        self.max_enemies = 40
+        self.enemies_spawned = 0
+
+    def spawn_enemies(self):
+        if self.t % 50 == 0:
+            x = random.randint(1, 3)
+            if x == 0:
+                e = enemies.DashFish
+            elif x == 1:
+                e = enemies.BigFish
+            else:
+                e = enemies.NormalFish
+            self.spawn_enemy(e, directions=[1])
             self.enemies_spawned += 1
             if self.enemies_spawned == self.max_enemies:
                 self.done_spawning = True
@@ -180,6 +201,7 @@ class WaveManager:
                 Wave1(game,1),
                 Wave2(game,2),
                 Wave3(game,3),
+                Wave4(game,4),
                 )
         self.wave_end_timer = Timer(120, done=True)
 

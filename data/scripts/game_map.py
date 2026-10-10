@@ -41,7 +41,7 @@ class Level:
         self.player_1 = Player1(self.game_map.game, name='side', pos=(x, -30), action='idle')
         self.player_2 = Player2(self.game_map.game, name='player_2', pos=(x, -30), action='idle')
         self.orb = Orb(self, (450, 74))
-        self.hp_bar = HpBar((0, 30), 20)
+        self.hp_bar = HpBar((0, 30), 30)
         self.hp_bar.real_pos[0] = 0.5*(config.GAME_SIZE[0] - self.hp_bar.img.get_width())
         self.enemies = []
         self.flakes = []
@@ -117,10 +117,10 @@ p                                                            p
             self.tutorial = False
             self.wave_manager.start_next_wave()
 
-        if game.inputs['pressed'].get('1'):
-            self.show_shop()
-        if game.inputs['pressed'].get('2'):
-            self.hide_shop()
+        # if game.inputs['pressed'].get('1'):
+        #     self.show_shop()
+        # if game.inputs['pressed'].get('2'):
+        #     self.hide_shop()
 
 
         if not self.shop.showing:
